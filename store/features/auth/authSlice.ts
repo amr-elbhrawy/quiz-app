@@ -11,7 +11,8 @@ interface AuthState {
   loading: boolean;
   error: string | null;
   successMsg: string | null;
-  user: any | null; 
+  user: any | null;
+  token: string | null;
 }
 
 const initialState: AuthState = {
@@ -19,6 +20,7 @@ const initialState: AuthState = {
   error: null,
   successMsg: null,
   user: null,
+  token: null,
 };
 
 const authSlice = createSlice({
@@ -29,6 +31,17 @@ const authSlice = createSlice({
       state.error = null;
       state.successMsg = null;
     },
+    logout: (state) => {
+      state.user = null;
+      state.token = null;
+      localStorage.removeItem('token');
+    },
+    setTokenFromStorage: (state) => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        state.token = token;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -37,16 +50,29 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginThunk.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user = action.payload;
-        state.successMsg = 'Login successful';
-      })
+.addCase(loginThunk.fulfilled, (state, action) => {
+  state.loading = false;
+
+  // استخراج البيانات الداخلية بشكل صحيح
+  const { accessToken, user } = action.payload.data;
+
+  state.user = user;
+  state.successMsg = 'Login successful';
+
+  if (accessToken) {
+    state.token = accessToken;
+    localStorage.setItem('token', accessToken);
+    console.log('Token saved successfully:', accessToken);
+  } else {
+    console.error('No token found in response:', action.payload);
+  }
+})
+
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-
+      
       // Signup
       .addCase(signupThunk.pending, (state) => {
         state.loading = true;
@@ -54,14 +80,21 @@ const authSlice = createSlice({
       })
       .addCase(signupThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.user || action.payload;
         state.successMsg = 'Signup successful';
+        
+        // حفظ التوكن من التسجيل أيضاً إذا كان متوفراً
+        const token = action.payload.token || action.payload.accessToken;
+        if (token) {
+          state.token = token;
+          localStorage.setItem('token', token);
+        }
       })
       .addCase(signupThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       })
-
+      
       // Forget Password
       .addCase(forgetPasswordThunk.pending, (state) => {
         state.loading = true;
@@ -75,7 +108,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-
+      
       // Reset Password
       .addCase(resetPasswordThunk.pending, (state) => {
         state.loading = true;
@@ -89,7 +122,7 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload as string;
       })
-
+      
       // Change Password
       .addCase(changePasswordThunk.pending, (state) => {
         state.loading = true;
@@ -106,5 +139,5 @@ const authSlice = createSlice({
   },
 });
 
-export const { clearAuthMessages } = authSlice.actions;
+export const { clearAuthMessages, logout, setTokenFromStorage } = authSlice.actions;
 export default authSlice.reducer;

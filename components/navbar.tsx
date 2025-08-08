@@ -30,14 +30,13 @@ export default function App() {
   return (
     <Navbar>
       <NavbarBrand>
-        <AcmeLogo />
-        <p className="font-bold text-inherit">ACME</p>
+         <p className="font-bold text-inherit">Groups</p>
       </NavbarBrand>
 
       <NavbarContent className="hidden sm:flex gap-4" justify="center">
         <NavbarItem>
           <Link color="foreground" href="#">
-            Features
+            Featu سسres
           </Link>
         </NavbarItem>
         <NavbarItem isActive>

@@ -1,69 +1,85 @@
-  "use client";
+"use client";
 
 import {
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Link,
-  DropdownItem,
-  DropdownTrigger,
+  Button,
   Dropdown,
+  DropdownTrigger,
   DropdownMenu,
-  Avatar,
+  DropdownItem,
+  Badge,
 } from "@heroui/react";
+import { FaRegBell } from "react-icons/fa";
+import { AiOutlineMail, AiOutlineArrowDown } from "react-icons/ai";
+import { BsAlarm } from "react-icons/bs";
 
-export const AcmeLogo = () => {
-  return (
-    <svg fill="none" height="36" viewBox="0 0 32 32" width="36">
-      <path
-        clipRule="evenodd"
-        d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-        fill="currentColor"
-        fillRule="evenodd"
-      />
-    </svg>
-  );
-};
-
-export default function App() {
+export default function AppNavbar({ active }: { active: string }) {
   return (
     <Navbar>
-      <NavbarBrand>
-        <AcmeLogo />
-        <p className="font-bold text-inherit">ACME</p>
+      {/* Title */}
+      <NavbarBrand className="justify-start">
+        <p className="font-bold text-inherit">{active}</p>
       </NavbarBrand>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      {/* Centered Content with vertical dividers */}
+      <NavbarContent className="hidden sm:flex gap-4" justify="end">
+        {/* New Quiz Button */}
         <NavbarItem>
-          <Link color="foreground" href="#">
-            Features
-          </Link>
+          <Button
+            variant="bordered"
+            className="gap-2 font-semibold text-black rounded-full px-4"
+          >
+            <span className="bg-black text-white p-1 rounded-full">
+              <BsAlarm size={18} />
+            </span>
+            New quiz
+          </Button>
         </NavbarItem>
-        <NavbarItem isActive>
-          <Link aria-current="page" color="secondary" href="#">
-            Customers
-          </Link>
+
+        {/* Vertical Divider */}
+        <div className="h-6 border-l border-gray-200 mx-2" />
+
+        {/* Mail Icon */}
+        <NavbarItem >
+          <Badge
+            content="10"
+            shape="circle"
+            style={{ backgroundColor: "#FFEDDF", color: "#000" }}
+          >
+            <AiOutlineMail size={24} />
+          </Badge>
         </NavbarItem>
+
+        {/* Vertical Divider */}
+        <div className="h-6 border-l border-gray-200 mx-2" />
+
+        {/* Bell Icon */}
         <NavbarItem>
-          <Link color="foreground" href="#">
-            Integrations
-          </Link>
+          <Badge
+            content="10"
+            shape="circle"
+            style={{ backgroundColor: "#FFEDDF", color: "#000" }}
+          >
+            <FaRegBell size={24} />
+          </Badge>
         </NavbarItem>
       </NavbarContent>
 
-      <NavbarContent as="div" justify="end">
+      {/* Right Side - User Info with vertical divider */}
+      <NavbarContent as="div" >
+        <div className="h-6 border-l border-gray-200 mx-4 hidden sm:block" />
         <Dropdown placement="bottom-end">
           <DropdownTrigger>
-            <Avatar
-              isBordered
-              as="button"
-              className="transition-transform"
-              color="secondary"
-              name="Jason Hughes"
-              size="sm"
-              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
-            />
+            <div className="flex flex-col items-start cursor-pointer">
+              <div className="flex items-center gap-2">
+                <h1 className="font-medium text-sm">Nwabuikwu Chizuruoke</h1>
+                <AiOutlineArrowDown size={14} color="#D9D9D9" />
+              </div>
+              <span className="text-green-500 text-xs font-semibold">Tutor</span>
+            </div>
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem key="profile" className="h-14 gap-2">

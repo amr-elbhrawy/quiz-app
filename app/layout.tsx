@@ -1,4 +1,3 @@
-// app/layout.tsx
 import "@/styles/globals.css";
 import clsx from "clsx";
 import { Viewport } from "next";
@@ -10,7 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "black" },
+    { media: "(prefers-color-scheme: dark)", color: "white" }, // خلي اللون أبيض دايمًا
   ],
 };
 
@@ -27,7 +26,7 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
+        <Providers themeProps={{ attribute: "class", defaultTheme: "light", forcedTheme: "light" }}>
           <ToastContainer position="top-right" autoClose={3000} />
           {children}
         </Providers>

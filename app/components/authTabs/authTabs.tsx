@@ -10,7 +10,7 @@ export default function AuthTabs({ active }: Props) {
     <div className="flex gap-4 mt-4">
       {/* Sign In */}
       <Link
-          href="/AuthLayout/login"
+          href="/auth/login"
         className={`flex flex-col items-center justify-center p-4 rounded-md w-1/2 text-white transition-transform transform hover:scale-105 active:scale-95 ${
           active === "signin"
             ? "bg-lime-500 bg-opacity-20 border border-lime-300"
@@ -27,7 +27,7 @@ export default function AuthTabs({ active }: Props) {
 
       {/* Sign Up */}
       <Link
-        href="/AuthLayout/register"
+        href="/auth/register"
         className={`flex flex-col items-center justify-center p-4 rounded-md w-1/2 text-white transition-transform transform hover:scale-105 active:scale-95 ${
           active === "signup"
             ? "bg-lime-500 bg-opacity-20 border border-lime-300"

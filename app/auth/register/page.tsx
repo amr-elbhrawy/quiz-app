@@ -138,7 +138,7 @@ export default function SignUpPage() {
           <p className="text-sm">
             Already have an account?{" "}
             <Link
-              href="/AuthLayout/login"
+              href="/auth/login"
               className="text-lime-300 hover:underline"
             >
               Sign in
