@@ -3,11 +3,40 @@ import { STUDENT_URL } from './endpoints';
 
 export const StudentService = {
   //    Get all students
-  // No body required
-  getAll: () => axiosInstance.get(STUDENT_URL.GET_ALL),
+    // {
+    //     "_id": "669f775dc85f1ecdbc306201",
+    //     "first_name": "omair",
+    //     "last_name": "Mohammed",
+    //     "email": "elrosyomair@gmail.com",
+    //     "status": "active",
+    //     "role": "Student",
+    //     "group": {
+    //         "_id": "66ce2247c85f1ecdbc313006",
+    //         "name": "Group1",
+    //         "status": "active",
+    //         "instructor": "66ce2073c85f1ecdbc312fb6",
+    //         "students": [
+    //             "669f775dc85f1ecdbc306201",
+    //             "66a14742c85f1ecdbc30663b"
+    //         ],
+    //         "max_students": 25,
+    //         "updatedAt": "2025-08-07T09:44:22.434Z",
+    //         "createdAt": "2024-08-27T19:00:23.773Z",
+    //         "__v": 0
+    //     }
+    // },
+      getAll: () => axiosInstance.get(STUDENT_URL.GET_ALL),
 
   //    Get all students without group
-  // No body required
+     // {
+    //     "_id": "6895151f44dab7b8cb065533",
+    //     "first_name": "Heba",
+    //     "last_name": "Saber",
+    //     "email": "heba@gmail.com",
+    //     "status": "active",
+    //     "role": "Student"
+    // },
+
   getAllWithoutGroup: () => axiosInstance.get(STUDENT_URL.GET_ALL_WITHOUT_GROUP),
 
   //    Get student by ID
