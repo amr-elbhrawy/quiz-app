@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import AppSidebar from "./Sidebar";
 import AppNavbar from "./Navbar";
 import GroupsList from "../group/GroupsList";
+import Students from "@/app/students/page";
 
 const DashboardLayout = () => {
   const [active, setActive] = useState("Groups");
@@ -18,6 +19,8 @@ const DashboardLayout = () => {
         <AppNavbar active={active} />
         {/* هنا تقدر تحط أي children أو محتوى صفحات تانية */}
         {active === "Groups" && <GroupsList />}
+        {active === "Students" && <Students />}
+
       </div>
     </div>
   );

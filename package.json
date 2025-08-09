@@ -23,6 +23,7 @@
     "@heroui/theme": "2.4.20",
     "@react-aria/ssr": "3.9.10",
     "@react-aria/visually-hidden": "3.8.26",
+    "@react-spring/web": "^10.0.1",
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.11.0",
     "clsx": "2.1.1",
