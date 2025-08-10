@@ -8,7 +8,7 @@ import {
 } from "@heroui/react";
 import { IoMdCheckmark } from "react-icons/io";
 import { HiOutlineXMark } from "react-icons/hi2";
-import Loader from "./Loader";
+import Loader from "../shared/ConfirmDeleteLoader";
 
 interface ConfirmDeleteModalProps {
   isOpen: boolean;

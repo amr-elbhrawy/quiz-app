@@ -8,6 +8,7 @@ import {
 } from "@heroui/react";
 import { IoMdCheckmark } from "react-icons/io";
 import { HiOutlineXMark } from "react-icons/hi2";
+ import Loader from "../components/shared/ConfirmDeleteLoader";
  
 interface ConfirmDeleteModalProps {
   isOpen: boolean;
@@ -71,6 +72,8 @@ export default function ConfirmDeleteModal({
             <p className={`text-gray-600 text-center ${isLoading ? 'mt-4' : ''}`}>
               {isLoading ? 'Deleting...' : message}
             </p>
+                        <Loader scale={2} />
+            
           </ModalBody>
         </>
       </ModalContent>

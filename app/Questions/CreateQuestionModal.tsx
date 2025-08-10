@@ -88,7 +88,7 @@ export default function CreateQuestionModal({
               <button
                 onClick={handleSubmit(onSubmit)}
                 title="Save"
-                className="flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-green-600"
+                className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-green-600"
                 disabled={isSubmitting}
               >
                 <HiCheck size={24} />
@@ -99,7 +99,7 @@ export default function CreateQuestionModal({
                   onClose();
                 }}
                 title="Close"
-                className="flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-600"
+                className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-600"
                 disabled={isSubmitting}
               >
                 <HiOutlineXMark size={24} />
@@ -110,11 +110,19 @@ export default function CreateQuestionModal({
           <ModalBody className="p-4 space-y-3">
             {/* Title */}
             <FieldGroup label="Title">
-              <input
+              <textarea
                 {...register("title", { required: "Title is required" })}
-                className="w-full px-3 py-2 outline-none"
-                type="text"
+                className="w-full px-3 py-2 outline-none min-h-[40px]"
                 disabled={isSubmitting}
+                style={{ 
+                  height: 'auto',
+                  overflow: 'hidden'
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = target.scrollHeight + 'px';
+                }}
               />
             </FieldGroup>
 
@@ -129,7 +137,7 @@ export default function CreateQuestionModal({
             </FieldGroup>
 
             {/* A & B */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
               <FieldGroup label="A">
                 <input
                   {...register("options.A", { required: "Option A is required" })}
@@ -149,7 +157,7 @@ export default function CreateQuestionModal({
             </div>
 
             {/* C & D */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
               <FieldGroup label="C">
                 <input
                   {...register("options.C", { required: "Option C is required" })}
@@ -169,7 +177,7 @@ export default function CreateQuestionModal({
             </div>
 
             {/* Difficulty & Type */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
               <FieldGroup label="Difficulty">
                 <select
                   {...register("difficulty")}

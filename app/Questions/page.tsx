@@ -259,7 +259,7 @@ export default function QuestionsTable() {
         <h2 className="text-xl font-bold text-gray-800">Bank Of Questions</h2>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-full shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200"
+          className="cursor-pointer flex items-center gap-2 bg-white border border-gray-300 px-4 py-2 rounded-full shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200"
         >
           <span className="text-black font-medium">+ Add Question</span>
         </button>

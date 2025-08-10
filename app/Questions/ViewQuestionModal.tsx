@@ -74,7 +74,7 @@ export default function ViewQuestionModal({
               <button
                 onClick={onClose}
                 title="Close"
-                className="flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-gray-800 transition-colors"
+                className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-gray-800 transition-colors"
               >
                 <HiOutlineXMark size={24} />
               </button>

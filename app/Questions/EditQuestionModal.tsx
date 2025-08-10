@@ -5,13 +5,11 @@ import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react";
 import { HiOutlineXMark, HiCheck } from "react-icons/hi2";
 import { QuestionService } from "@/services/question.service";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
 
-interface EditQuestionModalProps {
+interface CreateQuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpdated: () => void;
-  question: any; // السؤال المراد تعديله
+  onCreated: () => void;
 }
 
 interface QuestionFormInputs {
@@ -23,17 +21,15 @@ interface QuestionFormInputs {
   type: "FE" | "BE";
 }
 
-export default function EditQuestionModal({
+export default function CreateQuestionModal({
   isOpen,
   onClose,
-  onUpdated,
-  question,
-}: EditQuestionModalProps) {
+  onCreated,
+}: CreateQuestionModalProps) {
   const {
     register,
     handleSubmit,
     reset,
-    setValue,
     formState: { isSubmitting },
   } = useForm<QuestionFormInputs>({
     defaultValues: {
@@ -46,37 +42,17 @@ export default function EditQuestionModal({
     },
   });
 
-  // ملء البيانات عند فتح المودال
-  useEffect(() => {
-    if (question && isOpen) {
-      setValue("title", question.title || "");
-      setValue("description", question.description || "");
-      setValue("options.A", question.options?.A || "");
-      setValue("options.B", question.options?.B || "");
-      setValue("options.C", question.options?.C || "");
-      setValue("options.D", question.options?.D || "");
-      setValue("answer", question.answer || "A");
-      setValue("difficulty", question.difficulty || "easy");
-      setValue("type", question.type || "FE");
-    }
-  }, [question, isOpen, setValue]);
-
   const onSubmit: SubmitHandler<QuestionFormInputs> = async (data) => {
     try {
-      await QuestionService.update(question._id, data);
-      toast.success("Question updated successfully!");
+      await QuestionService.create(data);
+      toast.success("Question created successfully!");
       reset();
-      onUpdated();
+      onCreated();
       onClose();
     } catch (error) {
-      toast.error("Failed to update question.");
+      toast.error("Failed to create question.");
       console.error(error);
     }
-  };
-
-  const handleClose = () => {
-    reset();
-    onClose();
   };
 
   const FieldGroup = ({
@@ -106,29 +82,24 @@ export default function EditQuestionModal({
         <>
           <ModalHeader className="flex items-center justify-between border-b border-gray-300 p-0">
             <h2 className="px-6 py-4 text-lg font-bold">
-              Edit question
+              Set up a new question
             </h2>
             <div className="flex items-center">
               <button
                 onClick={handleSubmit(onSubmit)}
-                title="Save Changes"
-                className={`flex items-center justify-center w-12 h-12 border-l border-gray-300 transition-colors ${
-                  isSubmitting 
-                    ? 'cursor-not-allowed text-gray-400' 
-                    : 'hover:text-green-600'
-                }`}
+                title="Save"
+                className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-green-600"
                 disabled={isSubmitting}
               >
                 <HiCheck size={24} />
               </button>
               <button
-                onClick={handleClose}
+                onClick={() => {
+                  reset();
+                  onClose();
+                }}
                 title="Close"
-                className={`flex items-center justify-center w-12 h-12 border-l border-gray-300 transition-colors ${
-                  isSubmitting 
-                    ? 'cursor-not-allowed text-gray-400' 
-                    : 'hover:text-red-600'
-                }`}
+                className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-600"
                 disabled={isSubmitting}
               >
                 <HiOutlineXMark size={24} />
@@ -139,11 +110,19 @@ export default function EditQuestionModal({
           <ModalBody className="p-4 space-y-3">
             {/* Title */}
             <FieldGroup label="Title">
-              <input
+              <textarea
                 {...register("title", { required: "Title is required" })}
-                className="w-full px-3 py-2 outline-none"
-                type="text"
+                className="w-full px-3 py-2 outline-none min-h-[40px]"
                 disabled={isSubmitting}
+                style={{ 
+                  height: 'auto',
+                  overflow: 'hidden'
+                }}
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height = target.scrollHeight + 'px';
+                }}
               />
             </FieldGroup>
 
@@ -158,7 +137,7 @@ export default function EditQuestionModal({
             </FieldGroup>
 
             {/* A & B */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
               <FieldGroup label="A">
                 <input
                   {...register("options.A", { required: "Option A is required" })}
@@ -178,7 +157,7 @@ export default function EditQuestionModal({
             </div>
 
             {/* C & D */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
               <FieldGroup label="C">
                 <input
                   {...register("options.C", { required: "Option C is required" })}
@@ -198,7 +177,7 @@ export default function EditQuestionModal({
             </div>
 
             {/* Difficulty & Type */}
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-8">
               <FieldGroup label="Difficulty">
                 <select
                   {...register("difficulty")}
