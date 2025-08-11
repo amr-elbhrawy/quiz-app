@@ -27,6 +27,8 @@
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.11.0",
     "clsx": "2.1.1",
+    "flowbite": "^3.1.2",
+    "flowbite-react": "^0.12.6",
     "framer-motion": "11.18.2",
     "intl-messageformat": "10.7.16",
     "next": "15.3.1",

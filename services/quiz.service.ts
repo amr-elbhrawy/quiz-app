@@ -2,70 +2,58 @@ import { axiosInstance } from './api';
 import { QUIZ_URL } from './endpoints';
 
 export const QuizService = {
-  //   Get all quizzes
+  // Get all quizzes
   getAll: () => axiosInstance.get(QUIZ_URL.GET_ALL),
 
-  //   Get quiz by ID
+  // Get quiz by ID
   getById: (id: string) => axiosInstance.get(QUIZ_URL.GET_BY_ID(id)),
 
-  //   Create new quiz
-  //آNo body required
-create: () => axiosInstance.post(QUIZ_URL.CREATE),
-
-  //   Update quiz
-  //  {
-  //     "title":"Quiz A"
-  // }
-  update: (id: string, data: {
+  // Create new quiz
+  create: (data: {
     title: string;
-  }) => axiosInstance.put(QUIZ_URL.UPDATE(id), data),
+    description: string;
+    duration: number;
+    questions_number: number;
+    score_per_question: number;
+    schadule: string; // ISO format: YYYY-MM-DDTHH:mm
+    difficulty: string;
+    type: string;
+    group: string; // Group ID
+  }) => axiosInstance.post(QUIZ_URL.CREATE, data),
 
-  //   Delete quiz
-  // No body required
+  // Update quiz
+  update: (id: string, data: { title: string }) =>
+    axiosInstance.put(QUIZ_URL.UPDATE(id), data),
+
+  // Delete quiz
   delete: (id: string) => axiosInstance.delete(QUIZ_URL.DELETE(id)),
 
-  //   Join quiz (by code)
-  // {
-  //   "code": "quiz-code"
-  // }
-  join: (data: { code: string }) => axiosInstance.post(QUIZ_URL.JOIN, data),
+  // Join quiz
+  join: (data: { code: string }) =>
+    axiosInstance.post(QUIZ_URL.JOIN, data),
 
-  //   Submit quiz answers
-// {
-//     "answers":[
-//         {
-//             "question":"65c2d5e570b767ccc62a9615",
-//             "answer":"B"
-//         }
-//     ]
-// }
-  submit: (quizId: string, data: {
-    answers: { question: string; answer: string }[];
-  }) => axiosInstance.post(QUIZ_URL.SUBMIT(quizId), data),
+  // Submit quiz answers
+  submit: (
+    quizId: string,
+    data: { answers: { question: string; answer: string }[] }
+  ) => axiosInstance.post(QUIZ_URL.SUBMIT(quizId), data),
 
-  //   Get quiz without answers
-  getWithoutAnswers: (id: string) => axiosInstance.get(QUIZ_URL.WITHOUT_ANSWERS(id)),
+  // Get quiz without answers
+  getWithoutAnswers: (id: string) =>
+    axiosInstance.get(QUIZ_URL.WITHOUT_ANSWERS(id)),
 
-  //   Get quiz result
-  // No body required
+  // Get quiz result
   getResult: () => axiosInstance.get(QUIZ_URL.RESULT),
 
-  //   Get incoming quizzes
-    // No body required
-  getIncomming: () => axiosInstance.get(QUIZ_URL.INCOMMING),
+  // Get incoming quizzes
+  getIncoming: () => axiosInstance.get(QUIZ_URL.INCOMMING),
 
-  //   Get completed quizzes
-  // No body required
+  // Get completed quizzes
   getCompleted: () => axiosInstance.get(QUIZ_URL.COMPLETED),
 
-  //   Reassign quiz
-//   {
-//     "group":"65c2bed779b859ea9320885f",
-//     "schadule":"2024-02-16T21:19:34",
-//     "duration":"45"
-// }
-reassign: (
-  quizId: string,
-  data: { group: string; schadule: string; duration: string }
-) => axiosInstance.post(QUIZ_URL.REASSIGN(quizId), data),
+  // Reassign quiz
+  reassign: (
+    quizId: string,
+    data: { group: string; schadule: string; duration: string }
+  ) => axiosInstance.post(QUIZ_URL.REASSIGN(quizId), data),
 };

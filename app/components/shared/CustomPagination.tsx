@@ -35,6 +35,17 @@ export default function CustomPagination({
   page,
   setPage,
 }: CustomPaginationProps) {
+  // حساب عدد الصفحات المناسب حسب عرض الشاشة
+  const getSiblingsAndBoundaries = () => {
+    if (typeof window === 'undefined') return { siblings: 1, boundaries: 1 };
+    
+    const width = window.innerWidth;
+    if (width < 400) return { siblings: 0, boundaries: 1 }; // عرض محدود جداً
+    if (width < 640) return { siblings: 1, boundaries: 1 }; // موبايل
+    return { siblings: 2, boundaries: 2 }; // شاشات كبيرة
+  };
+
+  const { siblings, boundaries } = getSiblingsAndBoundaries();
   const renderItem = ({
     ref,
     key,
@@ -44,8 +55,9 @@ export default function CustomPagination({
     onPrevious,
     setPage: setInnerPage,
   }) => {
+    // تحديد حجم الأزرار حسب نوع الشاشة
     const baseBtn =
-      "min-w-8 w-8 h-8 flex items-center justify-center rounded-full transform transition-all duration-300 ease-in-out cursor-pointer active:scale-95";
+      "min-w-6 w-6 h-6 xs:min-w-8 xs:w-8 xs:h-8 sm:min-w-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transform transition-all duration-300 ease-in-out cursor-pointer active:scale-95 touch-manipulation select-none";
 
     if (value === PaginationItemType.NEXT) {
       return (
@@ -56,8 +68,9 @@ export default function CustomPagination({
             "bg-gray-200 hover:bg-[#C5D86D]/50 hover:scale-110"
           )}
           onClick={onNext}
+          aria-label="Next page"
         >
-          <ChevronIcon className="rotate-180" />
+          <ChevronIcon className="rotate-180 text-xs xs:text-sm sm:text-base" />
         </button>
       );
     }
@@ -71,8 +84,9 @@ export default function CustomPagination({
             "bg-gray-200 hover:bg-[#C5D86D]/50 hover:scale-110"
           )}
           onClick={onPrevious}
+          aria-label="Previous page"
         >
-          <ChevronIcon />
+          <ChevronIcon className="text-xs xs:text-sm sm:text-base" />
         </button>
       );
     }
@@ -81,7 +95,7 @@ export default function CustomPagination({
       return (
         <span
           key={key}
-          className="px-2 text-gray-500 select-none transition-opacity duration-300"
+          className="px-1 xs:px-2 text-gray-500 select-none transition-opacity duration-300 text-xs xs:text-sm sm:text-base"
         >
           ...
         </span>
@@ -95,10 +109,11 @@ export default function CustomPagination({
         className={cn(
           baseBtn,
           isActive
-            ? "bg-[#C5D86D] text-white font-bold border border-[#C5D86D] scale-110 shadow-md"
-            : "bg-[#C5D86D]/30 text-black hover:bg-[#C5D86D]/50 hover:scale-105"
+            ? "bg-[#C5D86D] text-white font-bold border border-[#C5D86D] scale-110 shadow-md text-xs xs:text-sm sm:text-base"
+            : "bg-[#C5D86D]/30 text-black hover:bg-[#C5D86D]/50 hover:scale-105 text-xs xs:text-sm sm:text-base"
         )}
         onClick={() => setInnerPage(value)}
+        aria-label={`Go to page ${value}`}
       >
         {value}
       </button>
@@ -106,16 +121,18 @@ export default function CustomPagination({
   };
 
   return (
-    <div className="flex justify-center py-4">
+    <div className="flex justify-center py-2 sm:py-4 px-2">
       <Pagination
         disableCursorAnimation
         showControls
-        className="gap-2"
+        className="gap-1 xs:gap-2 sm:gap-3"
         total={totalPages}
         page={page}
         onChange={setPage}
         renderItem={renderItem}
         variant="light"
+        siblings={siblings}
+        boundaries={boundaries}
       />
     </div>
   );

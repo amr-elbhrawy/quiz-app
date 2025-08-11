@@ -2,18 +2,17 @@
 
 import React, { useEffect, useState } from "react";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchGroups } from "@/store/features/group/groupsSlice";
+import { StudentService } from "@/services/student.service";
 import { GroupService } from "@/services/group.service";
 import { toast } from "react-toastify";
 import AddGroupModal from "./AddGroupModal";
 import UpdateGroupModal from "./UpdateGroupModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
-import CustomPagination from "../shared/CustomPagination";
+import CustomPagination from "../../components/shared/CustomPagination";
 
 export default function GroupsList() {
-  const dispatch = useDispatch<any>();
-  const { groups, loading } = useSelector((state: any) => state.groups);
+  const [groups, setGroups] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
@@ -21,12 +20,35 @@ export default function GroupsList() {
   const [groupToDelete, setGroupToDelete] = useState<string | null>(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 6; // عدد الكروت في الصفحة
-  const totalPages = Math.ceil(groups.length / pageSize);
+  const pageSize = 6;
 
   useEffect(() => {
-    dispatch(fetchGroups());
-  }, [dispatch]);
+    fetchGroupsFromStudents();
+  }, []);
+
+  const fetchGroupsFromStudents = async () => {
+    try {
+      setLoading(true);
+      const { data } = await StudentService.getAll();
+      // تجميع الطلاب حسب الجروب
+      const groupMap: Record<string, any> = {};
+      data.forEach((student: any) => {
+        if (student.group) {
+          const groupId = student.group._id;
+          if (!groupMap[groupId]) {
+            groupMap[groupId] = { ...student.group, students: [] };
+          }
+          groupMap[groupId].students.push(student);
+        }
+      });
+      setGroups(Object.values(groupMap));
+    } catch (error) {
+      console.error("Error fetching groups from students:", error);
+      toast.error("Failed to fetch groups");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDeleteClick = (id: string) => {
     setGroupToDelete(id);
@@ -35,11 +57,10 @@ export default function GroupsList() {
 
   const confirmDelete = async () => {
     if (!groupToDelete) return;
-
     try {
       await GroupService.delete(groupToDelete);
       toast.success("Group deleted successfully");
-      dispatch(fetchGroups());
+      fetchGroupsFromStudents();
     } catch (error: any) {
       toast.error(error?.response?.data?.message || "Failed to delete group");
     } finally {
@@ -48,6 +69,7 @@ export default function GroupsList() {
     }
   };
 
+  const totalPages = Math.ceil(groups.length / pageSize);
   const paginatedGroups = groups.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
@@ -60,7 +82,7 @@ export default function GroupsList() {
         <h2 className="text-xl font-semibold">Groups List</h2>
         <button
           onClick={() => setIsAddModalOpen(true)}
-          className=" cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
+          className="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
         >
           <FaPlus /> Add Group
         </button>
@@ -77,12 +99,25 @@ export default function GroupsList() {
               className="border border-gray-200 rounded-lg p-4 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow"
             >
               <div>
-                <h3 className="font-semibold">
+                <h3 className="font-semibold mb-2">
                   Group : {group.name || "name"}
                 </h3>
-                <p className="text-gray-600 text-sm">
+                <p className="text-gray-600 text-sm mb-2">
                   No. of students : {group.students?.length || 0}
                 </p>
+
+                {/* عرض الطلبة */}
+                {group.students && group.students.length > 0 ? (
+                  <ul className="list-disc pl-5 text-sm text-gray-700">
+                    {group.students.map((student: any) => (
+                      <li key={student._id}>
+                        {student.first_name} {student.last_name}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-gray-400 text-sm italic">No students</p>
+                )}
               </div>
 
               {/* الأزرار */}
@@ -94,7 +129,7 @@ export default function GroupsList() {
                   <FaEdit />
                 </button>
                 <button
-                  className="text-gray-600 hover:text-red-500  cursor-pointer"
+                  className="text-gray-600 hover:text-red-500 cursor-pointer"
                   onClick={() => handleDeleteClick(group._id)}
                 >
                   <FaTrash />
@@ -108,32 +143,30 @@ export default function GroupsList() {
       )}
 
       {/* الباجينشن */}
-<CustomPagination
-  totalPages={totalPages}
-  page={currentPage}
-  setPage={setCurrentPage}
-/>
+      <CustomPagination
+        totalPages={totalPages}
+        page={currentPage}
+        setPage={setCurrentPage}
+      />
 
-      {/* مودال الإضافة */}
+      {/* مودالات */}
       {isAddModalOpen && (
         <AddGroupModal
           isOpen={isAddModalOpen}
           onClose={() => setIsAddModalOpen(false)}
-          onAdded={() => dispatch(fetchGroups())}
+          onAdded={() => fetchGroupsFromStudents()}
         />
       )}
 
-      {/* مودال التعديل */}
       {editGroupId && (
         <UpdateGroupModal
           isOpen={!!editGroupId}
           onClose={() => setEditGroupId(null)}
           groupId={editGroupId}
-          onUpdated={() => dispatch(fetchGroups())}
+          onUpdated={() => fetchGroupsFromStudents()}
         />
       )}
 
-      {/* مودال الحذف */}
       <ConfirmDeleteModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}

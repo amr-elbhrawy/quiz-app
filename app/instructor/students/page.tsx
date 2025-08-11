@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { StudentService } from "../../services/student.service";
+import { StudentService } from "../../../services/student.service";
 import Image from "next/image";
 import { FaEye } from "react-icons/fa";
 import CustomPagination from "@/app/components/shared/CustomPagination";

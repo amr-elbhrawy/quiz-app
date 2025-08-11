@@ -92,22 +92,32 @@ export default function ViewStudentModal({ isOpen, onClose, student }: Props) {
 
                 {/* الإيميل + الحالة */}
                 <div className="flex border rounded-lg overflow-hidden shadow-sm">
-                  <div className="bg-orange-100 px-4 sm:px-6 py-3 sm:py-4 font-semibold min-w-[100px] sm:min-w-[120px] text-sm sm:text-lg">
+                  <div className="bg-orange-100 px-4 sm:px-6 py-3 sm:py-4 font-semibold min-w-[100px] sm:min-w-[120px] text-sm sm:text-md">
                     Email
                   </div>
-                  <div className="px-4 sm:px-6 py-3 sm:py-4 flex-1 flex justify-between items-center text-sm sm:text-lg">
+                  <div className="px-1 sm:px-3 py-3 sm:py-4 flex-1 flex justify-between items-center text-sm sm:text-lg">
                     {student.email}
-                    <span
+    
+                  </div>
+                </div>
+                <div className="flex border rounded-lg overflow-hidden shadow-sm">
+                  <div className="bg-orange-100 px-4 sm:px-6 py-3 sm:py-4 font-semibold min-w-[100px] sm:min-w-[120px] text-sm sm:text-md">
+                    Status
+                  </div>
+                  <div className="px-1 sm:px-3 py-3 sm:py-4 flex-1 flex justify-between items-center text-sm sm:text-lg">
+                             <span
                       className={`font-semibold ${
                         student.status === "Active"
                           ? "text-green-500"
                           : "text-red-500"
-                      }`}
+                      }`    }
                     >
                       {student.status}
-                    </span>
-                  </div>
+                    </span>                  </div>
                 </div>
+   
+  
+                
               </div>
             ) : (
               <p className="text-sm sm:text-lg">No data available</p>
