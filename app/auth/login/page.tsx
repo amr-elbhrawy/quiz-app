@@ -45,7 +45,7 @@ export default function LoginPage() {
       reset();
       dispatch(clearAuthMessages());
       setTimeout(() => {
-        router.push('/test-navbar');
+        router.push('/test');
       }, 0);
     }
   }, [error, successMsg, dispatch, reset, router]);
@@ -100,6 +100,7 @@ export default function LoginPage() {
             disabled={loading}
           >
             {loading ? 'Loading...' : 'Sign In'} <FaCheckCircle />
+            <Link href="/test"> </Link>
           </button>
 
           <p className="text-sm">

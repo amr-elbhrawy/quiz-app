@@ -8,6 +8,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { resetPasswordThunk } from '@/store/features/auth/authThunk';
 import { toast } from 'react-toastify';
 import { clearAuthMessages } from '@/store/features/auth/authSlice';
+import router, { useRouter } from 'next/router';
 
 type ResetPasswordInputs = {
   otp: string;
@@ -17,6 +18,8 @@ type ResetPasswordInputs = {
 
 export default function ResetPasswordPage() {
   const dispatch = useAppDispatch();
+  // Using useRouter from next/navigation to handle navigation
+  const router = useRouter();
   const { loading, error, successMsg } = useAppSelector((state) => state.auth);
   const {
     register,
@@ -38,6 +41,8 @@ export default function ResetPasswordPage() {
     if (successMsg) {
       toast.success(successMsg);
       reset();
+      // Optionally redirect or perform other actions after successful reset  
+      router.push('/login'); // Uncomment if you want to redirect to login
       dispatch(clearAuthMessages());
     }
   }, [error, successMsg, dispatch, reset]);

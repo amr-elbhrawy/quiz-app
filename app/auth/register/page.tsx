@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
   FaEnvelope,
@@ -8,6 +8,8 @@ import {
   FaUser,
   FaCheckCircle,
   FaIdCard,
+  FaEye,
+  FaEyeSlash,
 } from "react-icons/fa";
 import InputShared from "@/app/components/shared/InputSHared";
 import AuthTabs from "@/app/components/authTabs/authTabs";
@@ -34,7 +36,12 @@ export default function SignUpPage() {
     reset,
     formState: { errors },
   } = useForm<SignUpFormInputs>();
-
+    const [showPassword, setShowPassword] = useState(false);
+  
+  // دالة لتبديل إظهار/إخفاء كلمة المرور
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   const onSubmit = (data: SignUpFormInputs) => {
     dispatch(signupThunk(data));
   };
@@ -115,16 +122,27 @@ export default function SignUpPage() {
         </div>
 
         {/* Password */}
-        <InputShared
-          name="password"
-          register={register}
-          label="Password"
-          placeholder="Type your password"
-          type="password"
-          iconInput={<FaLock className="text-gray-500" />}
-          validation={{ required: "Password is required" }}
-        />
-
+        <div className="relative">
+          <InputShared
+            name="password"
+            register={register}
+            label="Password"
+            placeholder="Type your password"
+            type={showPassword ? "text" : "password"}
+            iconInput={<FaLock className="text-gray-500" />}
+            validation={{ required: 'Password is required' }}
+          />
+          
+          {/* زر إظهار/إخفاء كلمة المرور */}
+          <button
+            type="button"
+            onClick={togglePasswordVisibility}
+            className="absolute left-3 top-[38px] text-gray-500 hover:text-gray-300 transition-colors"
+            title={showPassword ? "إخفاء كلمة المرور" : "إظهار كلمة المرور"}
+          >
+            {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+          </button>
+        </div>
         {/* Submit */}
         <div className="flex items-center justify-between mt-4">
           <button

@@ -1,20 +1,43 @@
+ 'use client';
 import React, { useState } from "react";
 import { FaUsers, FaChartBar, FaQuestionCircle, FaUserGraduate } from "react-icons/fa";
 import { MdOutlineQuiz } from "react-icons/md";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { IoMdLogOut } from "react-icons/io";
+import { useSelector } from "react-redux";
+import { logout } from "@/store/features/auth/authSlice";
+import { useDispatch } from 'react-redux';
+
 
 export default function Sidebar({ active, setActive, isSidebarOpen, setIsSidebarOpen }) {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+   const dispatch = useDispatch(); 
 
-  const menuItems = [
-    { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
-    { name: "Students", icon: <FaUserGraduate size={22} /> },
-    { name: "Groups", icon: <FaUsers size={22} /> },
-    { name: "Quizzes", icon: <MdOutlineQuiz size={22} /> },
-    { name: "Results", icon: <FaChartBar size={22} /> },
-    { name: "Help", icon: <FaQuestionCircle size={22} /> },
-  ];
+  // جلب الـ role من Redux
+  const role = useSelector((state) => state.auth.user?.role);
+
+  // تعريف القوائم لكل role
+  const menuItemsByRole = {
+    Instructor: [ // إضافة للـ capital case
+      { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
+      { name: "Students", icon: <FaUserGraduate size={22} /> },
+      { name: "Groups", icon: <FaUsers size={22} /> },
+      { name: "Quizzes", icon: <MdOutlineQuiz size={22} /> },
+      { name: "Results", icon: <FaChartBar size={22} /> },
+      { name: "Help", icon: <FaQuestionCircle size={22} /> },
+      // { name: "JoinQuiz", icon: <IoMdLogOut size={22} /> },
+    ],
+
+    Student: [ // إضافة للـ capital case
+      { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
+ 
+      { name: "JoinQuiz", icon: <MdOutlineQuiz size={22} /> },
+      { name: "Help", icon: <FaQuestionCircle size={22} /> },
+    ]
+  };
+
+  // الحصول على القائمة حسب الـ role مع handling للـ undefined
+  const menuItems = role ? menuItemsByRole[role] || menuItemsByRole.instructor : [];
 
   return (
     <>
@@ -36,11 +59,16 @@ export default function Sidebar({ active, setActive, isSidebarOpen, setIsSidebar
         <div>
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
             <button onClick={() => setIsSidebarExpanded(!isSidebarExpanded)} className="text-xl">☰</button>
+            {isSidebarExpanded && (
+              <div className="text-sm text-gray-500 capitalize">
+                {role || 'instructor'}
+              </div>
+            )}
           </div>
 
           {/* Menu */}
           <nav className="flex flex-col gap-1 p-2">
-            {menuItems.map((item) => (
+            {menuItems.length > 0 && menuItems.map((item) => (
               <button
                 key={item.name}
                 onClick={() => {
@@ -54,18 +82,33 @@ export default function Sidebar({ active, setActive, isSidebarOpen, setIsSidebar
                 {isSidebarExpanded && <span className="font-medium">{item.name}</span>}
               </button>
             ))}
+            {menuItems.length === 0 && (
+              <div className="p-3 text-center text-gray-500 text-sm">
+                Loading menu...
+              </div>
+            )}
           </nav>
         </div>
 
         {/* Logout */}
-        <div className="p-4 border-t border-gray-200">
-          <button className="flex items-center gap-3 w-full p-3 rounded-md hover:bg-gray-100 transition">
-            <div className="p-2 rounded-md bg-[#fde9df]">
-              <IoMdLogOut size={22} />
-            </div>
-            {isSidebarExpanded && <span className="font-medium">Logout</span>}
-          </button>
-        </div>
+      <div className="p-4 border-t border-gray-200">
+        <button
+          onClick={() => {
+            dispatch(logout());
+            
+            setIsSidebarOpen(false);
+            //الذهاب لصفحة التسجيل الدخول بعد تسجيل الخروج
+            window.location.href = '/auth/login';  // تأكد من تعديل الرابط حسب مسار صفحة تسجيل الدخول في تطبيقك
+        
+           }}
+          className="flex items-center gap-3 w-full p-3 rounded-md hover:bg-gray-100 transition"
+        >
+          <div className="p-2 rounded-md bg-[#fde9df]">
+            <IoMdLogOut size={22} />
+          </div>
+          {isSidebarExpanded && <span className="font-medium">Logout</span>}
+        </button>
+      </div>
       </div>
     </>
   );

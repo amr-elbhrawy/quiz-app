@@ -8,6 +8,7 @@ import { CompletedQuizzes } from "./CompletedQuizzes";
 import CreateQuizModal from "./CreateQuizModal";
 import { QuizService } from "@/services/quiz.service";
 import { toast } from "react-toastify";
+import QuizDetails from "./QuizDetails"; // استدعاء صفحة الكويز ديتيلز
 
 type HomeProps = {
   setActive: (key: string) => void;
@@ -17,6 +18,7 @@ export default function Home({ setActive }: HomeProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null); // لتخزين الـ ID للكويز المفتوح
 
   const fetchQuizzes = async () => {
     setLoading(true);
@@ -37,8 +39,13 @@ export default function Home({ setActive }: HomeProps) {
   const handleQuizCreated = () => {
     toast.success("Quiz created successfully!");
     setIsModalOpen(false);
-    fetchQuizzes(); // تحديث اللائحة بعد الإنشاء
+    fetchQuizzes(); 
   };
+
+  // لو المستخدم اختار كويز، نعرض صفحة التفاصيل بدل القائمة
+  if (selectedQuizId) {
+    return <QuizDetails quizId={selectedQuizId} onBack={() => setSelectedQuizId(null)} />;
+  }
 
   return (
     <div className="p-4 sm:p-6">
@@ -66,7 +73,11 @@ export default function Home({ setActive }: HomeProps) {
         </div>
 
         <div className="flex flex-col gap-6">
-          <UpcomingQuizzes quizzes={quizzes} loading={loading} />
+          <UpcomingQuizzes 
+            quizzes={quizzes} 
+            loading={loading} 
+            onOpenQuiz={(id) => setSelectedQuizId(id)} 
+          />
           <CompletedQuizzes />
         </div>
       </div>

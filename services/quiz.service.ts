@@ -21,9 +21,29 @@ export const QuizService = {
     group: string; // Group ID
   }) => axiosInstance.post(QUIZ_URL.CREATE, data),
 
-  // Update quiz
-  update: (id: string, data: { title: string }) =>
-    axiosInstance.put(QUIZ_URL.UPDATE(id), data),
+  // Update quiz - مع تصفية الحقول الآمنة
+  update: (id: string, data: any) => {
+    // الحقول الآمنة اللي شغالة بدون مشاكل
+    const safeFields = {
+      title: data.title,
+      description: data.description,
+      duration: data.duration,
+      score_per_question: data.score_per_question,
+      schadule: data.schadule,
+      questions_number: data.questions_number
+    };
+    
+    const cleanData = Object.keys(safeFields).reduce((acc, key) => {
+      const value = safeFields[key as keyof typeof safeFields];
+      if (value !== undefined && value !== null && value !== '') {
+        acc[key] = value;
+      }
+      return acc;
+    }, {} as any);
+    
+    console.log('Sending safe data for quiz update:', cleanData);
+    return axiosInstance.put(QUIZ_URL.UPDATE(id), cleanData);
+  },
 
   // Delete quiz
   delete: (id: string) => axiosInstance.delete(QUIZ_URL.DELETE(id)),

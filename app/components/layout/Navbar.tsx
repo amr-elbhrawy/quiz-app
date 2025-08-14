@@ -1,6 +1,7 @@
+'use client';
 import React, { useState } from "react";
 
-export default function Navbar({ setIsSidebarOpen }) {
+export default function Navbar({ setIsSidebarOpen, active }) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
   return (
@@ -18,7 +19,7 @@ export default function Navbar({ setIsSidebarOpen }) {
           </button>
 
           {/* Brand */}
-          <h1 className="text-xl font-bold">Brand</h1>
+          <h1 className="text-xl font-bold">{active}</h1>
 
           {/* Profile Menu */}
           <div className="relative">

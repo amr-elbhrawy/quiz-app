@@ -1,17 +1,11 @@
 import "@/styles/globals.css";
 import clsx from "clsx";
-import { Viewport } from "next";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "white" },
-    { media: "(prefers-color-scheme: dark)", color: "white" }, // خلي اللون أبيض دايمًا
-  ],
-};
+import AuthLoader from "@/app/components/AuthLoader/AuthLoader";
 
 export default function RootLayout({
   children,
@@ -26,7 +20,8 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "light", forcedTheme: "light" }}>
+        <Providers>
+          <AuthLoader /> {/* تحميل بيانات المستخدم من localStorage */}
           <ToastContainer position="top-right" autoClose={3000} />
           {children}
         </Providers>
