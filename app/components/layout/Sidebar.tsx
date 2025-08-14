@@ -14,30 +14,27 @@ export default function Sidebar({ active, setActive, isSidebarOpen, setIsSidebar
    const dispatch = useDispatch(); 
 
   // جلب الـ role من Redux
-  const role = useSelector((state) => state.auth.user?.role);
+const rawRole = useSelector((state) => state.auth.user?.role);
+const role = rawRole ? rawRole.toLowerCase() : "";
 
-  // تعريف القوائم لكل role
-  const menuItemsByRole = {
-    Instructor: [ // إضافة للـ capital case
-      { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
-      { name: "Students", icon: <FaUserGraduate size={22} /> },
-      { name: "Groups", icon: <FaUsers size={22} /> },
-      { name: "Quizzes", icon: <MdOutlineQuiz size={22} /> },
-      { name: "Results", icon: <FaChartBar size={22} /> },
-      { name: "Help", icon: <FaQuestionCircle size={22} /> },
-      // { name: "JoinQuiz", icon: <IoMdLogOut size={22} /> },
-    ],
+const menuItemsByRole = {
+  instructor: [
+    { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
+    { name: "Students", icon: <FaUserGraduate size={22} /> },
+    { name: "Groups", icon: <FaUsers size={22} /> },
+    { name: "Quizzes", icon: <MdOutlineQuiz size={22} /> },
+    { name: "Questions", icon: <FaQuestionCircle size={22} /> },
+    { name: "Results", icon: <FaChartBar size={22} /> },
+    { name: "Help", icon: <FaQuestionCircle size={22} /> },
+  ],
+  student: [
+    { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
+    { name: "JoinQuiz", icon: <MdOutlineQuiz size={22} /> },
+    { name: "Help", icon: <FaQuestionCircle size={22} /> },
+  ],
+};
 
-    Student: [ // إضافة للـ capital case
-      { name: "Dashboard", icon: <AiOutlineDashboard size={22} /> },
- 
-      { name: "JoinQuiz", icon: <MdOutlineQuiz size={22} /> },
-      { name: "Help", icon: <FaQuestionCircle size={22} /> },
-    ]
-  };
-
-  // الحصول على القائمة حسب الـ role مع handling للـ undefined
-  const menuItems = role ? menuItemsByRole[role] || menuItemsByRole.instructor : [];
+const menuItems = role ? menuItemsByRole[role] || [] : [];
 
   return (
     <>

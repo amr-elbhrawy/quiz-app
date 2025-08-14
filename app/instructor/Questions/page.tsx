@@ -10,7 +10,7 @@ import {
 import { QuestionService } from "@/services/question.service";
 import CustomPagination from "@/app/components/shared/CustomPagination";
 import CreateQuestionModal from "./CreateQuestionModal";
-import ConfirmDeleteModal from "./ConfirmDeleteModal";
+import ConfirmDeleteModal from "../../components/shared/ConfirmDeleteModal";
 import EditQuestionModal from "./EditQuestionModal";
 import ViewQuestionModal from "./ViewQuestionModal";
 

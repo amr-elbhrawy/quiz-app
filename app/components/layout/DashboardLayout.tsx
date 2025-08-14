@@ -10,15 +10,31 @@ import Quizzes from "@/app/instructor/Quizzes/page";
 import JoinQuiz from "@/app/learner/JoinQuiz/page";
 import { UpcomingQuizzes } from "@/app/instructor/Quizzes/UpcomingQuizzes";
 import QuizDetails from "@/app/instructor/Quizzes/QuizDetails";
+import Questions from "@/app/instructor/Questions/page";
+import SolveQuestionModal from "@/app/learner/JoinQuiz/SolveQuestionModal";
+import ScoreModal from "@/app/learner/JoinQuiz/ScoreModal";
 
 export default function DashboardLayout() {
   const [active, setActive] = useState("Dashboard");
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+const [isSolveModalOpen, setIsSolveModalOpen] = useState(false);
+const [solveQuizId, setSolveQuizId] = useState<string | null>(null);
+
+const [finalScore, setFinalScore] = useState<number | null>(null);
+const [finalTotal, setFinalTotal] = useState<number | null>(null);
+
+  // النتيجة
+  const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [scoreData, setScoreData] = useState<{ score: number; total: number } | null>(null);
 
   const loadingUser = useSelector((state: any) => state.auth.loadingUser);
   const role = useSelector((state: any) => state.auth.user?.role?.toLowerCase());
   const user = useSelector((state: any) => state.auth.user);
+const handleStartQuiz = (quizId: string) => {
+  setSolveQuizId(quizId);
+  setIsSolveModalOpen(true);
+};
 
   useEffect(() => {
     if (role && !loadingUser) {
@@ -50,7 +66,9 @@ export default function DashboardLayout() {
       case "Students": return <Students />;
       case "Groups": return <Groups />;
       case "Quizzes": return <Quizzes setActive={setActive} />;
-      default: return <div className="p-6 text-center text-gray-500">صفحة المدرس - {active}</div>;
+      case "Questions": return <Questions />;
+      default:
+        return <div className="p-6 text-center text-gray-500">صفحة المدرس - {active}</div>;
     }
   };
 
@@ -70,10 +88,19 @@ export default function DashboardLayout() {
             </div>
           </div>
         );
-      case "JoinQuiz": return <JoinQuiz />;
+      case "JoinQuiz":
+        return (
+          <JoinQuiz
+            onSolveQuiz={(quizId) => {
+              setSolveQuizId(quizId);
+              setIsSolveModalOpen(true);
+            }}
+          />
+        );
       case "MyCourses": return <div className="p-6 text-center text-gray-500">كورساتي</div>;
       case "MyGrades": return <div className="p-6 text-center text-gray-500">درجاتي</div>;
-      default: return <div className="p-6 text-center text-gray-500">صفحة الطالب - {active}</div>;
+      default:
+        return <div className="p-6 text-center text-gray-500">صفحة الطالب - {active}</div>;
     }
   };
 
@@ -129,6 +156,36 @@ export default function DashboardLayout() {
           {renderContent()}
         </main>
       </div>
+
+      {/* مودال حل الاختبار */}
+   {isSolveModalOpen && (
+  <SolveQuestionModal
+    quizId={solveQuizId || undefined}
+    onClose={() => {
+      setIsSolveModalOpen(false);
+      setSolveQuizId(null);
+    }}
+    onFinish={(score, total) => {
+      setFinalScore(score);
+      setFinalTotal(total);
+      setIsSolveModalOpen(false);
+      setIsScoreModalOpen(true);
+    }}
+  />
+)}
+
+{isScoreModalOpen && finalScore !== null && finalTotal !== null && (
+  <ScoreModal
+    score={finalScore}
+    total={finalTotal}
+    onClose={() => setIsScoreModalOpen(false)}
+    onReassign={() => {
+      console.log("إعادة تعيين الكويز");
+      setIsScoreModalOpen(false);
+    }}
+  />
+)}
+
     </div>
   );
 }

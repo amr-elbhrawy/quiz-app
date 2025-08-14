@@ -4,7 +4,8 @@ import { QuizService } from "@/services/quiz.service";
 import { toast } from "react-toastify";
 import { FaRegClock, FaAngleDoubleRight } from "react-icons/fa";
 import { BsCalendarDate } from "react-icons/bs";
-import EditQuizModal from "./EditQuizModal"; // استدعاء المودال
+import EditQuizModal from "./EditQuizModal";
+import ConfirmDeleteModal from "../../components/shared/ConfirmDeleteModal";
 
 export default function QuizDetails({
   quizId,
@@ -15,7 +16,10 @@ export default function QuizDetails({
 }) {
   const [quiz, setQuiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [editOpen, setEditOpen] = useState(false); // حالة فتح المودال
+  const [editOpen, setEditOpen] = useState(false);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const fetchQuiz = async () => {
     try {
@@ -31,6 +35,20 @@ export default function QuizDetails({
   useEffect(() => {
     fetchQuiz();
   }, [quizId]);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    try {
+      await QuizService.delete(quizId);
+      toast.success("Quiz deleted successfully");
+      setDeleteOpen(false);
+      onBack();
+    } catch {
+      toast.error("Failed to delete quiz");
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   if (loading) return <p>Loading...</p>;
   if (!quiz) return <p>No quiz found.</p>;
@@ -84,15 +102,24 @@ export default function QuizDetails({
           <label className="text-gray-700">Randomize questions</label>
         </div>
 
-        <button
-          onClick={() => setEditOpen(true)} // فتح المودال
-          className="mt-6 flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800"
-        >
-          ✏️ Edit
-        </button>
+        <div className="flex gap-3 mt-6">
+          <button
+            onClick={() => setEditOpen(true)}
+            className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800"
+          >
+            ✏️ Edit
+          </button>
+
+          <button
+            onClick={() => setDeleteOpen(true)}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+          >
+            🗑 Delete
+          </button>
+        </div>
       </div>
 
-      {/* مودال تعديل الكويز */}
+      {/* مودال تعديل */}
       <EditQuizModal
         isOpen={editOpen}
         onClose={() => setEditOpen(false)}
@@ -101,13 +128,21 @@ export default function QuizDetails({
           setQuiz((prev: any) => ({
             ...prev,
             ...updatedQuiz,
-            questions_number: updatedQuiz.noOfQuestions ?? prev.questions_number
+            questions_number:
+              updatedQuiz.noOfQuestions ?? prev.questions_number
           }));
           setEditOpen(false);
         }}
       />
 
-
+      {/* مودال الحذف */}
+      <ConfirmDeleteModal
+        isOpen={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDelete}
+        message={`Are you sure you want to delete "${quiz.title}"?`}
+        isLoading={deleting}
+      />
     </div>
   );
 }

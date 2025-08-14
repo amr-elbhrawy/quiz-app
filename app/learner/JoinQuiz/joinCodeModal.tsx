@@ -9,9 +9,10 @@ import { QuizService } from "@/services/quiz.service";
 interface JoinQuizModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onJoinSuccess: (quizId: string) => void;
 }
 
-export default function JoinQuizModal({ isOpen, onClose }: JoinQuizModalProps) {
+export default function JoinQuizModal({ isOpen, onClose, onJoinSuccess }: JoinQuizModalProps) {
   const [quizCode, setQuizCode] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -21,11 +22,22 @@ export default function JoinQuizModal({ isOpen, onClose }: JoinQuizModalProps) {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("You must be logged in to join a quiz");
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await QuizService.join({ code: quizCode });
+      console.log("Join response:", res.data);
       toast.success(res.data?.message || "You joined the quiz successfully!");
-      onClose();
+      
+      // الـ quiz في response.data.data.quiz
+      const quizId = res.data?.data?.quiz || res.data?.quiz;
+      console.log("Extracted quizId:", quizId);
+      onJoinSuccess(quizId);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Invalid quiz code");
     } finally {

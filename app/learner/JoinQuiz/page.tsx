@@ -8,7 +8,11 @@ import JoinQuizModal from "./joinCodeModal";
 import { QuizService } from "@/services/quiz.service";
 import { toast } from "react-toastify";
 
-export default function JoinQuiz() {
+interface JoinQuizProps {
+  onSolveQuiz: (quizId: string) => void;
+}
+
+export default function JoinQuiz({ onSolveQuiz }: JoinQuizProps) {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [quizzes, setQuizzes] = useState([]);
@@ -65,7 +69,10 @@ export default function JoinQuiz() {
       <JoinQuizModal
         isOpen={isJoinModalOpen}
         onClose={() => setIsJoinModalOpen(false)}
-        quizId={selectedQuizId}
+        onJoinSuccess={(quizId) => {
+          setIsJoinModalOpen(false);
+          onSolveQuiz(quizId);
+        }}
       />
     </div>
   );

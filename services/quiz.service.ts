@@ -23,7 +23,6 @@ export const QuizService = {
 
   // Update quiz - مع تصفية الحقول الآمنة
   update: (id: string, data: any) => {
-    // الحقول الآمنة اللي شغالة بدون مشاكل
     const safeFields = {
       title: data.title,
       description: data.description,
@@ -48,9 +47,19 @@ export const QuizService = {
   // Delete quiz
   delete: (id: string) => axiosInstance.delete(QUIZ_URL.DELETE(id)),
 
-  // Join quiz
-  join: (data: { code: string }) =>
-    axiosInstance.post(QUIZ_URL.JOIN, data),
+  // Join quiz - مع debugging
+  join: (data: { code: string }) => {
+    console.log('Joining quiz with code:', data.code);
+    return axiosInstance.post(QUIZ_URL.JOIN, data)
+      .then(response => {
+        console.log('Join API response:', response.data);
+        return response;
+      })
+      .catch(error => {
+        console.error('Join API error:', error);
+        throw error;
+      });
+  },
 
   // Submit quiz answers
   submit: (
@@ -58,9 +67,19 @@ export const QuizService = {
     data: { answers: { question: string; answer: string }[] }
   ) => axiosInstance.post(QUIZ_URL.SUBMIT(quizId), data),
 
-  // Get quiz without answers
-  getWithoutAnswers: (id: string) =>
-    axiosInstance.get(QUIZ_URL.WITHOUT_ANSWERS(id)),
+  // Get quiz without answers - مع debugging
+  getWithoutAnswers: (id: string) => {
+    console.log('Fetching quiz without answers, ID:', id);
+    return axiosInstance.get(QUIZ_URL.WITHOUT_ANSWERS(id))
+      .then(response => {
+        console.log('Quiz without answers response:', response.data);
+        return response;
+      })
+      .catch(error => {
+        console.error('Quiz without answers error:', error);
+        throw error;
+      });
+  },
 
   // Get quiz result
   getResult: () => axiosInstance.get(QUIZ_URL.RESULT),
@@ -74,6 +93,6 @@ export const QuizService = {
   // Reassign quiz
   reassign: (
     quizId: string,
-    data: { group: string; schadule: string; duration: string }
-  ) => axiosInstance.post(QUIZ_URL.REASSIGN(quizId), data),
+    data: { group: string; schadule: string; duration: number }
+  ) => axiosInstance.put(QUIZ_URL.REASSIGN(quizId), data),
 };

@@ -14,6 +14,8 @@ export default function GroupsList() {
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const [searchTerm, setSearchTerm] = useState(""); // ⬅️ state للسيرش
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -30,7 +32,6 @@ export default function GroupsList() {
     try {
       setLoading(true);
       const { data } = await StudentService.getAll();
-      // تجميع الطلاب حسب الجروب
       const groupMap: Record<string, any> = {};
       data.forEach((student: any) => {
         if (student.group) {
@@ -69,17 +70,35 @@ export default function GroupsList() {
     }
   };
 
-  const totalPages = Math.ceil(groups.length / pageSize);
-  const paginatedGroups = groups.slice(
+  // ⬅️ فلترة المجموعات حسب السيرش
+  const filteredGroups = groups.filter((group) =>
+    group.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const totalPages = Math.ceil(filteredGroups.length / pageSize);
+  const paginatedGroups = filteredGroups.slice(
     (currentPage - 1) * pageSize,
     currentPage * pageSize
   );
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
-      {/* العنوان + زر إضافة */}
-      <div className="flex justify-between items-center mb-6">
+      {/* العنوان + زر إضافة + سيرش */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-semibold">Groups List</h2>
+
+        {/* سيرش */}
+        <input
+          type="text"
+          placeholder="Search groups..."
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // ⬅️ يرجع لأول صفحة عند البحث
+          }}
+          className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-gray-200"
+        />
+
         <button
           onClick={() => setIsAddModalOpen(true)}
           className="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-100 border border-gray-300 rounded-full hover:bg-gray-200"
@@ -106,7 +125,6 @@ export default function GroupsList() {
                   No. of students : {group.students?.length || 0}
                 </p>
 
-                {/* عرض الطلبة */}
                 {group.students && group.students.length > 0 ? (
                   <ul className="list-disc pl-5 text-sm text-gray-700">
                     {group.students.map((student: any) => (
@@ -120,7 +138,6 @@ export default function GroupsList() {
                 )}
               </div>
 
-              {/* الأزرار */}
               <div className="flex gap-4 mt-4">
                 <button
                   className="text-gray-600 hover:text-amber-500 cursor-pointer"
