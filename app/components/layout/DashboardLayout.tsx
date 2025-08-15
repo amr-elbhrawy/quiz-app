@@ -13,6 +13,7 @@ import QuizDetails from "@/app/instructor/Quizzes/QuizDetails";
 import Questions from "@/app/instructor/Questions/page";
 import SolveQuestionModal from "@/app/learner/JoinQuiz/SolveQuestionModal";
 import ScoreModal from "@/app/learner/JoinQuiz/ScoreModal";
+import QuizResultsTable from "@/app/instructor/Results/page"; // أو المسار الصحيح
 
 export default function DashboardLayout() {
   const [active, setActive] = useState("Dashboard");
@@ -67,6 +68,7 @@ const handleStartQuiz = (quizId: string) => {
       case "Groups": return <Groups />;
       case "Quizzes": return <Quizzes setActive={setActive} />;
       case "Questions": return <Questions />;
+      case "Results": return <QuizResultsTable />;  
       default:
         return <div className="p-6 text-center text-gray-500">صفحة المدرس - {active}</div>;
     }

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Pagination, PaginationItemType } from "@heroui/react";
 import { cn } from "@heroui/react";
 
@@ -35,17 +36,32 @@ export default function CustomPagination({
   page,
   setPage,
 }: CustomPaginationProps) {
-  // حساب عدد الصفحات المناسب حسب عرض الشاشة
-  const getSiblingsAndBoundaries = () => {
-    if (typeof window === 'undefined') return { siblings: 1, boundaries: 1 };
-    
+  const [siblings, setSiblings] = useState(1);
+  const [boundaries, setBoundaries] = useState(1);
+
+  // تحديث الإعدادات حسب عرض الشاشة
+  const updatePaginationConfig = () => {
     const width = window.innerWidth;
-    if (width < 400) return { siblings: 0, boundaries: 1 }; // عرض محدود جداً
-    if (width < 640) return { siblings: 1, boundaries: 1 }; // موبايل
-    return { siblings: 2, boundaries: 2 }; // شاشات كبيرة
+    if (width < 400) {
+      setSiblings(0);
+      setBoundaries(1);
+    } else if (width < 1024) {
+      setSiblings(1);
+      setBoundaries(1);
+    } else {
+      setSiblings(2);
+      setBoundaries(2);
+    }
   };
 
-  const { siblings, boundaries } = getSiblingsAndBoundaries();
+  useEffect(() => {
+    updatePaginationConfig();
+    window.addEventListener("resize", updatePaginationConfig);
+    return () => {
+      window.removeEventListener("resize", updatePaginationConfig);
+    };
+  }, []);
+
   const renderItem = ({
     ref,
     key,
@@ -55,7 +71,6 @@ export default function CustomPagination({
     onPrevious,
     setPage: setInnerPage,
   }) => {
-    // تحديد حجم الأزرار حسب نوع الشاشة
     const baseBtn =
       "min-w-6 w-6 h-6 xs:min-w-8 xs:w-8 xs:h-8 sm:min-w-10 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transform transition-all duration-300 ease-in-out cursor-pointer active:scale-95 touch-manipulation select-none";
 
@@ -121,7 +136,7 @@ export default function CustomPagination({
   };
 
   return (
-    <div className="flex justify-center py-2 sm:py-4 px-2">
+    <div className="flex justify-center py-2 sm:py-4 px-2 overflow-x-auto">
       <Pagination
         disableCursorAnimation
         showControls
