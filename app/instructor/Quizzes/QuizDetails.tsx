@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { QuizService } from "@/services/quiz.service";
 import { toast } from "react-toastify";
-import { FaRegClock, FaAngleDoubleRight } from "react-icons/fa";
+import { FaRegClock, FaAngleDoubleRight, FaEdit, FaTrash } from "react-icons/fa";
 import { BsCalendarDate } from "react-icons/bs";
 import EditQuizModal from "./EditQuizModal";
 import ConfirmDeleteModal from "../../components/shared/ConfirmDeleteModal";
+import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard";
 
 export default function QuizDetails({
   quizId,
@@ -17,7 +18,6 @@ export default function QuizDetails({
   const [quiz, setQuiz] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editOpen, setEditOpen] = useState(false);
-
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -50,7 +50,7 @@ export default function QuizDetails({
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <LoadingSkeletonCard width="100%" height="40px" count={5} />;
   if (!quiz) return <p>No quiz found.</p>;
 
   return (
@@ -102,24 +102,26 @@ export default function QuizDetails({
           <label className="text-gray-700">Randomize questions</label>
         </div>
 
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={() => setEditOpen(true)}
-            className="flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800"
-          >
-            ✏️ Edit
-          </button>
+<div className="flex gap-3 mt-6">
+  <button
+    onClick={() => setEditOpen(true)}
+    className="cursor-pointer flex items-center gap-2 bg-gray-900 text-white px-4 py-2 rounded hover:bg-gray-800"
+  >
+    <FaEdit />
+    <span>Edit</span>
+  </button>
 
-          <button
-            onClick={() => setDeleteOpen(true)}
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-          >
-            🗑 Delete
-          </button>
-        </div>
+  <button
+    onClick={() => setDeleteOpen(true)}
+    className="cursor-pointer flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+  >
+    <FaTrash />
+    <span>Delete</span>
+  </button>
+</div>
       </div>
 
-      {/* مودال تعديل */}
+      {/* Edit Modal */}
       <EditQuizModal
         isOpen={editOpen}
         onClose={() => setEditOpen(false)}
@@ -135,7 +137,7 @@ export default function QuizDetails({
         }}
       />
 
-      {/* مودال الحذف */}
+      {/* Delete Modal */}
       <ConfirmDeleteModal
         isOpen={deleteOpen}
         onClose={() => setDeleteOpen(false)}

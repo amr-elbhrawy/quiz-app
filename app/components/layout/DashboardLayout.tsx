@@ -13,34 +13,29 @@ import QuizDetails from "@/app/instructor/Quizzes/QuizDetails";
 import Questions from "@/app/instructor/Questions/page";
 import SolveQuestionModal from "@/app/learner/JoinQuiz/SolveQuestionModal";
 import ScoreModal from "@/app/learner/JoinQuiz/ScoreModal";
-import QuizResultsTable from "@/app/instructor/Results/page"; // أو المسار الصحيح
+import QuizResultsTable from "@/app/instructor/Results/page";
 
 export default function DashboardLayout() {
   const [active, setActive] = useState("Dashboard");
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-const [isSolveModalOpen, setIsSolveModalOpen] = useState(false);
-const [solveQuizId, setSolveQuizId] = useState<string | null>(null);
-
-const [finalScore, setFinalScore] = useState<number | null>(null);
-const [finalTotal, setFinalTotal] = useState<number | null>(null);
-
-  // النتيجة
+  const [isSolveModalOpen, setIsSolveModalOpen] = useState(false);
+  const [solveQuizId, setSolveQuizId] = useState<string | null>(null);
+  const [finalScore, setFinalScore] = useState<number | null>(null);
+  const [finalTotal, setFinalTotal] = useState<number | null>(null);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
-  const [scoreData, setScoreData] = useState<{ score: number; total: number } | null>(null);
 
   const loadingUser = useSelector((state: any) => state.auth.loadingUser);
   const role = useSelector((state: any) => state.auth.user?.role?.toLowerCase());
   const user = useSelector((state: any) => state.auth.user);
-const handleStartQuiz = (quizId: string) => {
-  setSolveQuizId(quizId);
-  setIsSolveModalOpen(true);
-};
+
+  const handleStartQuiz = (quizId: string) => {
+    setSolveQuizId(quizId);
+    setIsSolveModalOpen(true);
+  };
 
   useEffect(() => {
-    if (role && !loadingUser) {
-      setActive("Dashboard");
-    }
+    if (role && !loadingUser) setActive("Dashboard");
   }, [role, loadingUser]);
 
   const renderInstructorContent = () => {
@@ -48,7 +43,7 @@ const handleStartQuiz = (quizId: string) => {
       case "Dashboard":
         return (
           <div className="space-y-6">
-            <h1 className="text-2xl font-bold">لوحة تحكم المدرس</h1>
+            <h1 className="text-2xl font-bold">Instructor Dashboard</h1>
             <UpcomingQuizzes
               onOpenQuiz={(quizId) => {
                 setSelectedQuizId(quizId);
@@ -64,13 +59,18 @@ const handleStartQuiz = (quizId: string) => {
             onBack={() => setActive("Dashboard")}
           />
         );
-      case "Students": return <Students />;
-      case "Groups": return <Groups />;
-      case "Quizzes": return <Quizzes setActive={setActive} />;
-      case "Questions": return <Questions />;
-      case "Results": return <QuizResultsTable />;  
+      case "Students":
+        return <Students />;
+      case "Groups":
+        return <Groups />;
+      case "Quizzes":
+        return <Quizzes setActive={setActive} />;
+      case "Questions":
+        return <Questions />;
+      case "Results":
+        return <QuizResultsTable />;
       default:
-        return <div className="p-6 text-center text-gray-500">صفحة المدرس - {active}</div>;
+        return <div className="p-6 text-center text-gray-500">Instructor Page - {active}</div>;
     }
   };
 
@@ -79,13 +79,13 @@ const handleStartQuiz = (quizId: string) => {
       case "Dashboard":
         return (
           <div className="space-y-6">
-            <h1 className="text-2xl font-bold">لوحة تحكم الطالب</h1>
+            <h1 className="text-2xl font-bold">Student Dashboard</h1>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <UpcomingQuizzes onJoin={(quizId) => setActive("JoinQuiz")} />
+              <UpcomingQuizzes onJoin={() => setActive("JoinQuiz")} />
               <div className="border border-gray-300 rounded-lg p-4">
-                <h2 className="text-lg font-semibold mb-4">إحصائيات سريعة</h2>
-                <p className="text-sm text-gray-600">مرحباً {user?.name || "طالب"}</p>
-                <p className="text-sm text-gray-600">الصف: {user?.group?.name || "غير محدد"}</p>
+                <h2 className="text-lg font-semibold mb-4">Quick Stats</h2>
+                <p className="text-sm text-gray-600">Welcome {user?.name || "Student"}</p>
+                <p className="text-sm text-gray-600">Group: {user?.group?.name || "Not Assigned"}</p>
               </div>
             </div>
           </div>
@@ -99,10 +99,8 @@ const handleStartQuiz = (quizId: string) => {
             }}
           />
         );
-      case "MyCourses": return <div className="p-6 text-center text-gray-500">كورساتي</div>;
-      case "MyGrades": return <div className="p-6 text-center text-gray-500">درجاتي</div>;
       default:
-        return <div className="p-6 text-center text-gray-500">صفحة الطالب - {active}</div>;
+        return <div className="p-6 text-center text-gray-500">Student Page - {active}</div>;
     }
   };
 
@@ -110,10 +108,6 @@ const handleStartQuiz = (quizId: string) => {
     if (loadingUser) {
       return (
         <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">جاري تحميل بيانات المستخدم...</p>
-          </div>
         </div>
       );
     }
@@ -123,8 +117,8 @@ const handleStartQuiz = (quizId: string) => {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <div className="text-red-500 text-4xl mb-4">⚠️</div>
-            <p className="text-gray-600">ليس لديك صلاحية للدخول</p>
-            <p className="text-sm text-gray-400 mt-2">يرجى تسجيل الدخول أولاً</p>
+            <p className="text-gray-600">Access Denied</p>
+            <p className="text-sm text-gray-400 mt-2">Please log in first</p>
           </div>
         </div>
       );
@@ -137,8 +131,8 @@ const handleStartQuiz = (quizId: string) => {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="text-orange-500 text-4xl mb-4">🔒</div>
-          <p className="text-gray-600">نوع المستخدم غير معروف: {role}</p>
-          <p className="text-sm text-gray-400 mt-2">يرجى التواصل مع الإدارة</p>
+          <p className="text-gray-600">Unknown role: {role}</p>
+          <p className="text-sm text-gray-400 mt-2">Please contact the administrator</p>
         </div>
       </div>
     );
@@ -154,40 +148,32 @@ const handleStartQuiz = (quizId: string) => {
       />
       <div className="flex-1 flex flex-col min-w-0 w-full">
         <Navbar setIsSidebarOpen={setIsSidebarOpen} active={active} />
-        <main className="flex-1 overflow-auto p-2 sm:p-4 md:p-6 bg-gray-50">
-          {renderContent()}
-        </main>
+        <main className="flex-1 overflow-auto p-2 sm:p-4 md:p-6 bg-gray-50">{renderContent()}</main>
       </div>
 
-      {/* مودال حل الاختبار */}
-   {isSolveModalOpen && (
-  <SolveQuestionModal
-    quizId={solveQuizId || undefined}
-    onClose={() => {
-      setIsSolveModalOpen(false);
-      setSolveQuizId(null);
-    }}
-    onFinish={(score, total) => {
-      setFinalScore(score);
-      setFinalTotal(total);
-      setIsSolveModalOpen(false);
-      setIsScoreModalOpen(true);
-    }}
-  />
-)}
+      {isSolveModalOpen && (
+        <SolveQuestionModal
+          quizId={solveQuizId || undefined}
+          onClose={() => {
+            setIsSolveModalOpen(false);
+            setSolveQuizId(null);
+          }}
+          onFinish={(score, total) => {
+            setFinalScore(score);
+            setFinalTotal(total);
+            setIsSolveModalOpen(false);
+            setIsScoreModalOpen(true);
+          }}
+        />
+      )}
 
-{isScoreModalOpen && finalScore !== null && finalTotal !== null && (
-  <ScoreModal
-    score={finalScore}
-    total={finalTotal}
-    onClose={() => setIsScoreModalOpen(false)}
-    onReassign={() => {
-      console.log("إعادة تعيين الكويز");
-      setIsScoreModalOpen(false);
-    }}
-  />
-)}
-
+      {isScoreModalOpen && finalScore !== null && finalTotal !== null && (
+        <ScoreModal
+          score={finalScore}
+          total={finalTotal}
+          onClose={() => setIsScoreModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

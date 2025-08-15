@@ -5,17 +5,18 @@ import {
   ModalHeader,
   ModalBody,
 } from "@heroui/react";
-import { FaCheck, FaTimes } from "react-icons/fa";
+import { IoMdCheckmark } from 'react-icons/io';
+import { HiOutlineXMark } from 'react-icons/hi2';
 import { useEffect, useState } from "react";
 import { StudentService } from "@/services/student.service";
 import { GroupService } from "@/services/group.service";
 import { toast } from "react-toastify";
-import { IoMdCheckmark } from 'react-icons/io';
-import { HiOutlineXMark } from 'react-icons/hi2';
+import Loader from "@/app/components/shared/LoadingSkeletonCard"; // Reusable Skeleton Loader
+
 interface AddGroupModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAdded: () => void; // بعد الحفظ
+  onAdded: () => void;  
 }
 
 export default function AddGroupModal({ isOpen, onClose, onAdded }: AddGroupModalProps) {
@@ -70,33 +71,32 @@ export default function AddGroupModal({ isOpen, onClose, onAdded }: AddGroupModa
     <Modal isOpen={isOpen} placement="top-center" onOpenChange={onClose} hideCloseButton>
       <ModalContent>
         <>
-<ModalHeader className="flex items-center justify-between border-b border-gray-300 p-0">
-  <h2 className="px-4 py-3 text-lg font-semibold">
-    Set up a new Group
-  </h2>
-  <div className="flex items-center">
-    <button
-      onClick={handleSave}
-      title="Create"
-      disabled={saving}
-      className="flex items-center justify-center w-12 h-12 border-l border-gray-300  hover:text-green-800   disabled:opacity-50 cursor-pointer text-xl0"
-    >
-      <IoMdCheckmark />
-    </button>
-    <button
-      onClick={onClose}
-      title="Cancel"
-      className="flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-800   disabled:opacity-50 cursor-pointer text-xl"
-    >
-      <HiOutlineXMark />
-    </button>
-  </div>
-</ModalHeader>
-
+          <ModalHeader className="flex items-center justify-between border-b border-gray-300 p-0">
+            <h2 className="px-4 py-3 text-lg font-semibold">
+              Set up a new Group
+            </h2>
+            <div className="flex items-center">
+              <button
+                onClick={handleSave}
+                title="Create"
+                disabled={saving}
+                className="flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-green-800 disabled:opacity-50 cursor-pointer"
+              >
+                <IoMdCheckmark />
+              </button>
+              <button
+                onClick={onClose}
+                title="Cancel"
+                className="flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-800 cursor-pointer"
+              >
+                <HiOutlineXMark />
+              </button>
+            </div>
+          </ModalHeader>
 
           <ModalBody>
             <div className="flex flex-col gap-4">
-              {/* Group Name */}
+              {/* Group Name input */}
               <div className="flex items-center rounded-md border border-gray-300 overflow-hidden w-full">
                 <span className="bg-orange-100 px-3 py-2 text-sm text-gray-700 whitespace-nowrap">
                   Group Name
@@ -110,11 +110,14 @@ export default function AddGroupModal({ isOpen, onClose, onAdded }: AddGroupModa
                 />
               </div>
 
-              {/* Students */}
+              {/* Students list */}
               <div className="rounded-md border border-gray-300 p-2 max-h-48 overflow-y-auto">
                 <p className="text-sm font-medium mb-2">Select Students</p>
                 {loadingStudents ? (
-                  <p className="text-gray-500 text-sm">Loading...</p>
+                  // Skeleton UI for loading state
+                  <>
+                    <Loader width="100%" height="40px" count={4} />
+                  </>
                 ) : studentsList.length === 0 ? (
                   <p className="text-gray-500 text-sm">No students available</p>
                 ) : (

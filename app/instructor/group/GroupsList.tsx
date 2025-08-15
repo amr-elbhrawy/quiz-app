@@ -9,12 +9,13 @@ import AddGroupModal from "./AddGroupModal";
 import UpdateGroupModal from "./UpdateGroupModal";
 import ConfirmDeleteModal from "./ConfirmDeleteModal";
 import CustomPagination from "../../components/shared/CustomPagination";
+import Loader from "@/app/components/shared/LoadingSkeletonCard";
 
 export default function GroupsList() {
   const [groups, setGroups] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [searchTerm, setSearchTerm] = useState(""); // ⬅️ state للسيرش
+  const [searchTerm, setSearchTerm] = useState(""); // Search term state
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [editGroupId, setEditGroupId] = useState<string | null>(null);
@@ -70,7 +71,7 @@ export default function GroupsList() {
     }
   };
 
-  // ⬅️ فلترة المجموعات حسب السيرش
+  // Filter groups based on search term
   const filteredGroups = groups.filter((group) =>
     group.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -83,18 +84,18 @@ export default function GroupsList() {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
-      {/* العنوان + زر إضافة + سيرش */}
+      {/* Title + Add button + Search */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-semibold">Groups List</h2>
 
-        {/* سيرش */}
+        {/* Search input */}
         <input
           type="text"
           placeholder="Search groups..."
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
-            setCurrentPage(1); // ⬅️ يرجع لأول صفحة عند البحث
+            setCurrentPage(1); // Reset to first page when searching
           }}
           className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-gray-200"
         />
@@ -107,9 +108,9 @@ export default function GroupsList() {
         </button>
       </div>
 
-      {/* الكروت */}
+      {/* Cards */}
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <Loader />
       ) : paginatedGroups.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {paginatedGroups.map((group: any) => (
@@ -159,14 +160,14 @@ export default function GroupsList() {
         <p className="text-center text-gray-500">No groups found</p>
       )}
 
-      {/* الباجينشن */}
+      {/* Pagination */}
       <CustomPagination
         totalPages={totalPages}
         page={currentPage}
         setPage={setCurrentPage}
       />
 
-      {/* مودالات */}
+      {/* Modals */}
       {isAddModalOpen && (
         <AddGroupModal
           isOpen={isAddModalOpen}

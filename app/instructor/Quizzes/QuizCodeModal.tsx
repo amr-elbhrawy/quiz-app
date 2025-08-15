@@ -3,17 +3,19 @@
 import { useState } from "react";
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react";
 import { HiOutlineXMark, HiClipboard, HiCheck } from "react-icons/hi2";
+import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard";
 
 interface QuizCodeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  code: string;
+  code?: string;  
 }
 
 export default function QuizCodeModal({ isOpen, onClose, code }: QuizCodeModalProps) {
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
+    if (!code) return;
     navigator.clipboard.writeText(code).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
@@ -45,12 +47,19 @@ export default function QuizCodeModal({ isOpen, onClose, code }: QuizCodeModalPr
             <p className="text-lg font-semibold mb-4">
               The code your students will use to take the quiz:
             </p>
-            <div className="inline-block px-6 py-4 bg-orange-50 border border-orange-400 rounded-lg text-2xl font-mono select-all">
-              {code || "N/A"}
-            </div>
+
+            {!code ? (
+              <LoadingSkeletonCard width="100%" height="50px" count={1} />
+            ) : (
+              <div className="inline-block px-6 py-4 bg-orange-50 border border-orange-400 rounded-lg text-2xl font-mono select-all">
+                {code}
+              </div>
+            )}
+
             <button
               onClick={copyToClipboard}
-              className="mt-3 px-4 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded flex items-center justify-center mx-auto gap-2"
+              disabled={!code}
+              className="mt-3 px-4 py-2 bg-orange-400 hover:bg-orange-500 text-white rounded flex items-center justify-center mx-auto gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               title="Copy code"
             >
               {copied ? (

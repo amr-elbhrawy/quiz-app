@@ -146,7 +146,7 @@ export default function SolveQuestionModal({
             <div className="space-y-3">
  {currentQ.options &&
   Object.entries(currentQ.options)
-    .filter(([key]) => !key.startsWith("_")) // استبعاد أي مفتاح يبدأ بـ _
+    .filter(([key]) => !key.startsWith("_"))  
     .map(([key, value]) => (
       <button
         key={key}

@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { QuizService } from "../../../services/quiz.service";
+import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard";
 
 interface UpcomingQuiz {
   title: string;
@@ -18,8 +19,8 @@ interface UpcomingQuiz {
 
 interface UpcomingQuizzesProps {
   refreshTrigger?: number;
-  onJoin?: (quizId: string) => void; // للطالب
-  onOpenQuiz?: (quizId: string) => void; // للمعلم
+  onJoin?: (quizId: string) => void; // For students
+  onOpenQuiz?: (quizId: string) => void; // For teachers
 }
 
 export const UpcomingQuizzes = ({ refreshTrigger, onJoin, onOpenQuiz }: UpcomingQuizzesProps) => {
@@ -103,24 +104,13 @@ export const UpcomingQuizzes = ({ refreshTrigger, onJoin, onOpenQuiz }: Upcoming
   const hasMoreQuizzes = allQuizzes.length > 5;
 
   if (loading) {
-    return (
-      <div className="border border-gray-300 rounded-lg p-4">
-        <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-          <div className="space-y-3">
-            <div className="h-16 bg-gray-200 rounded"></div>
-            <div className="h-16 bg-gray-200 rounded"></div>
-            <div className="h-16 bg-gray-200 rounded"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingSkeletonCard width="100%" height="80px" count={3} />;
   }
 
   return (
     <div className="border border-gray-300 rounded-lg p-4">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Upcoming quizzes</h2>
+        <h2 className="text-lg font-semibold">Upcoming Quizzes</h2>
         <span className="text-sm text-gray-500 bg-gray-100 px-2 py-1 rounded">
           {showAll ? allQuizzes.length : Math.min(5, allQuizzes.length)} of {allQuizzes.length}
         </span>
@@ -148,28 +138,27 @@ export const UpcomingQuizzes = ({ refreshTrigger, onJoin, onOpenQuiz }: Upcoming
                     {q.date} │ {q.time}
                   </p>
                   <p className="text-sm text-gray-500">
-                    No. of student's enrolled: {q.students}
+                    No. of students enrolled: {q.students}
                   </p>
                   <p className="text-xs text-blue-600 font-medium">
                     Status: {q.status}
                   </p>
                 </div>
-            <button
-  onClick={() => {
-    if (role?.toLowerCase() === "student") {
-      onJoin?.(q.quizId);
-    } else {
-      onOpenQuiz?.(q.quizId);
-    }
-  }}
-  className={`flex items-center font-medium hover:underline ${
-    role?.toLowerCase() === "student" ? "text-blue-600" : "text-green-600"
-  }`}
->
-  {role?.toLowerCase() === "student" ? "Join" : "Open"}
-  <FaArrowRight className="ml-1" />
-</button>
-
+                <button
+                  onClick={() => {
+                    if (role?.toLowerCase() === "student") {
+                      onJoin?.(q.quizId);
+                    } else {
+                      onOpenQuiz?.(q.quizId);
+                    }
+                  }}
+                  className={`flex items-center font-medium hover:underline ${
+                    role?.toLowerCase() === "student" ? "text-blue-600" : "text-green-600"
+                  }`}
+                >
+                  {role?.toLowerCase() === "student" ? "Join" : "Open"}
+                  <FaArrowRight className="ml-1" />
+                </button>
               </div>
             ))}
           </div>

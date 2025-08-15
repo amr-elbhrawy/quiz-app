@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { FaArrowRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { QuizService } from "@/services/quiz.service";
+import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard";
 
 interface CompletedQuiz {
   title: string;
@@ -19,7 +19,6 @@ export const CompletedQuizzes = () => {
     const fetchCompleted = async () => {
       try {
         const res = await QuizService.getCompleted();
-        // هنا الـ backend هيرجع quizzes بناء على الـ role في الـ token
         const processedData = res.data.map((item: any, i: number) => ({
           title: item.title || `Quiz ${i + 1}`,
           group: typeof item.group === "string" ? item.group : item.group?.name || "No Group",
@@ -39,10 +38,10 @@ export const CompletedQuizzes = () => {
     fetchCompleted();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return <LoadingSkeletonCard width="100%" height="40px" count={5} />;
 
   if (completed.length === 0) {
-    return <p className="text-gray-500">لا توجد اختبارات مكتملة</p>;
+    return <p className="text-gray-500">No completed quizzes found</p>;
   }
 
   return (

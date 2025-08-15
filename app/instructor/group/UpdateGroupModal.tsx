@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { GroupService } from "@/services/group.service";
 import { StudentService } from "@/services/student.service";
 import { toast } from "react-toastify";
+import Loader from "@/app/components/shared/LoadingSkeletonCard";
 
 interface UpdateGroupModalProps {
   isOpen: boolean;
@@ -132,8 +133,8 @@ export default function UpdateGroupModal({
 
           {/* Body */}
           <ModalBody>
-            {loading ? (
-              <p className="text-gray-500 text-sm">Loading...</p>
+             {loading ? (
+    <Loader />
             ) : (
               <div className="flex flex-col gap-4">
                 {/* Group Name */}
