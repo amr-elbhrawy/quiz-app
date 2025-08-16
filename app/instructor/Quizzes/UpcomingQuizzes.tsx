@@ -130,7 +130,7 @@ export const UpcomingQuizzes = ({ refreshTrigger, onJoin, onOpenQuiz }: Upcoming
                 className="flex items-center gap-4 border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
               >
                 <div className="w-20 h-20 bg-orange-100 rounded-lg flex items-center justify-center overflow-hidden">
-                  <img src={q.img} alt={q.title} className="w-full h-full object-cover" />
+                  <img src={q.img} alt={q.title} loading="lazy" className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold">{q.title}</h3>

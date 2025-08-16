@@ -18,7 +18,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   loading: false,
-  loadingUser: true, // نبدأ بتحميل المستخدم
+  loadingUser: true,  
   error: null,
   successMsg: null,
   user: null,
@@ -42,12 +42,12 @@ logout: (state) => {
   state.error = null;
   state.successMsg = null;
   
-  // تنظيف localStorage
+  
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   
-  // تنظيف أي بيانات أخرى محفوظة
-  localStorage.clear(); // إذا كنت تريد تنظيف كامل
+ 
+  localStorage.clear();
 },
 
     setUserFromStorageStart: (state) => {

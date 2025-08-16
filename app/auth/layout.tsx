@@ -1,4 +1,4 @@
-// app/auth/layout.tsx
+// auth/layout.tsx
 import React from 'react';
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -7,16 +7,16 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-12 z-10">
         <div className="w-full max-w-md text-white">
           <div className="mb-6">
-            <img src="/Logo.png" alt="Quizwiz Logo" className="h-10 mb-2" />
+            <img src="/Logo-white.png"  alt="Quizwiz Logo" className="h-10 mb-2" />
           </div>
           {children}
         </div>
       </div>
-
+      
       <div className="hidden lg:flex lg:w-1/2 items-center justify-center relative p-8">
         <div className="bg-[#ffeede] rounded-3xl p-8 max-w-lg max-h-[600px] w-full h-auto flex items-center justify-center">
           <img
-            src="/Image.svg"
+            src="/Login.svg"
             alt="Quizwiz Illustration"
             className="w-full h-auto max-h-[500px] object-contain"
           />

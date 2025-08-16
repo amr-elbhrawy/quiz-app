@@ -1,14 +1,15 @@
 'use client';
-
 import InputShared from '@/app/components/shared/InputSHared';
 import { useForm } from 'react-hook-form';
 import { RiLockPasswordLine } from 'react-icons/ri';
+import { FiArrowLeft } from 'react-icons/fi';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { changePasswordThunk } from '@/store/features/auth/authThunk';
 import { clearAuthMessages } from '@/store/features/auth/authSlice';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';        
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface FormData {
   password: string;
@@ -16,8 +17,9 @@ interface FormData {
 }
 
 const ChangePasswordPage = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const dispatch = useAppDispatch();
-  const router = useRouter();  
+  const router = useRouter();
 
   const { register, reset, handleSubmit, formState: { errors } } = useForm<FormData>();
   const { loading, error, successMsg } = useAppSelector(state => state.auth);
@@ -28,6 +30,7 @@ const ChangePasswordPage = () => {
   };
 
   useEffect(() => {
+    setIsLoaded(true);
     if (error) {
       toast.error(error);
     }
@@ -35,8 +38,8 @@ const ChangePasswordPage = () => {
     if (successMsg) {
       toast.success(successMsg);
       setTimeout(() => {
-        router.push('/AuthLayout/login');  
-      }, 1500);  
+        router.push('/dashboard');
+      }, 1500);
     }
 
     return () => {
@@ -45,7 +48,18 @@ const ChangePasswordPage = () => {
   }, [error, successMsg, dispatch, router]);
 
   return (
-    <div className="w-full text-white">
+    <div className={`w-full text-white transition-all duration-500 ease-in-out transform ${
+      isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      {/* Back Button */}
+      <Link 
+        href="/dashboard" 
+        className="inline-flex items-center gap-2 text-lime-300 hover:text-lime-200 transition-all duration-300 hover:gap-3 mb-4"
+      >
+        <FiArrowLeft size={16} className="transition-transform duration-300 hover:-translate-x-1" />
+        Back to dashboard
+      </Link>
+
       <h2 className="text-xl font-semibold text-lime-300 mb-2">
         Update your password
       </h2>
@@ -53,7 +67,7 @@ const ChangePasswordPage = () => {
         For your security, please provide your current and new password.
       </p>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="max-w-md w-full space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Current Password */}
         <InputShared
           register={register}
@@ -75,7 +89,13 @@ const ChangePasswordPage = () => {
           register={register}
           name="password_new"
           type="password"
-          validation={{ required: 'The new password is required' }}
+          validation={{ 
+            required: 'The new password is required',
+            minLength: {
+              value: 6,
+              message: 'New password must be at least 6 characters'
+            }
+          }}
           iconInput={<RiLockPasswordLine className="text-gray-500" />}
           label="New password"
           placeholder="Type your new password"
@@ -87,13 +107,13 @@ const ChangePasswordPage = () => {
         )}
 
         {/* Submit Button */}
-        <div className="flex justify-end pt-2">
+        <div className="flex justify-center pt-4">
           <button
             type="submit"
             disabled={loading}
-            className="bg-white text-black px-4 py-2 rounded-md font-semibold hover:bg-gray-100 cursor-pointer"
+            className="bg-white text-black px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 cursor-pointer disabled:opacity-70"
           >
-            {loading ? 'Sending...' : 'Send'}
+            {loading ? 'Updating...' : 'Update Password'}
           </button>
         </div>
       </form>

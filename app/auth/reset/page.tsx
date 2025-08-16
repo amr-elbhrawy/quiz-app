@@ -1,14 +1,15 @@
 'use client';
-
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEnvelope, FaLock, FaCheckCircle } from 'react-icons/fa';
+import { FiArrowLeft } from 'react-icons/fi';
 import InputShared from '@/app/components/shared/InputSHared';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { resetPasswordThunk } from '@/store/features/auth/authThunk';
 import { toast } from 'react-toastify';
 import { clearAuthMessages } from '@/store/features/auth/authSlice';
-import router, { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type ResetPasswordInputs = {
   otp: string;
@@ -18,7 +19,6 @@ type ResetPasswordInputs = {
 
 export default function ResetPasswordPage() {
   const dispatch = useAppDispatch();
-  // Using useRouter from next/navigation to handle navigation
   const router = useRouter();
   const { loading, error, successMsg } = useAppSelector((state) => state.auth);
   const {
@@ -28,11 +28,12 @@ export default function ResetPasswordPage() {
     formState: { errors },
   } = useForm<ResetPasswordInputs>();
 
-  const onSubmit = (data: ResetPasswordInputs) => {
+ const onSubmit = (data: ResetPasswordInputs) => {
     dispatch(resetPasswordThunk(data));
   };
 
   useEffect(() => {
+    setIsLoaded(true);
     if (error) {
       toast.error(error);
       dispatch(clearAuthMessages());
@@ -41,19 +42,29 @@ export default function ResetPasswordPage() {
     if (successMsg) {
       toast.success(successMsg);
       reset();
-      // Optionally redirect or perform other actions after successful reset  
-      router.push('/login'); // Uncomment if you want to redirect to login
+      setTimeout(() => router.push('/auth'), 300);
       dispatch(clearAuthMessages());
     }
-  }, [error, successMsg, dispatch, reset]);
+  }, [error, successMsg, dispatch, reset, router]);
 
   return (
-    <div className="w-full text-white">
-      <h2 className="text-xl font-semibold text-lime-300">
+    <div className={`w-full text-white transition-all duration-500 ease-in-out transform ${
+      isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+    }`}>
+      {/* Back Button */}
+      <Link 
+        href="/auth/forget" 
+        className="inline-flex items-center gap-2 text-lime-300 hover:text-lime-200 transition-all duration-300 hover:gap-3 mb-4"
+      >
+        <FiArrowLeft size={16} className="transition-transform duration-300 hover:-translate-x-1" />
+        Back
+      </Link>
+
+      <h2 className="text-xl font-semibold text-lime-300 mb-4">
         Reset your password on <span className="text-white">QuizWiz</span>
       </h2>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <InputShared
           name="otp"
           register={register}
@@ -93,11 +104,11 @@ export default function ResetPasswordPage() {
           <p className="text-red-400 text-sm ml-1">{errors.password.message}</p>
         )}
 
-        <div className="flex items-center justify-between mt-4 ">
+        <div className="flex justify-center pt-4">
           <button
             type="submit"
             title="Reset Password"
-            className="flex items-center gap-2 bg-white text-black px-4 py-2 rounded-md font-semibold cursor-pointer"
+            className="flex items-center gap-2 bg-white text-black px-6 py-2.5 rounded-lg font-semibold hover:bg-gray-100 transition-all duration-200 cursor-pointer disabled:opacity-70"
             disabled={loading}
           >
             {loading ? 'Loading...' : 'Reset Password'} <FaCheckCircle />

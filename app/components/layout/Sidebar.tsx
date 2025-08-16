@@ -64,27 +64,28 @@ const menuItems = role ? menuItemsByRole[role] || [] : [];
           </div>
 
           {/* Menu */}
-          <nav className="flex flex-col gap-1 p-2">
-            {menuItems.length > 0 && menuItems.map((item) => (
-              <button
-                key={item.name}
-                onClick={() => {
-                  setActive(item.name);
-                  setIsSidebarOpen(false);
-                }}
-                className={`flex items-center gap-3 p-3 rounded-md transition-all duration-200 w-full text-left
-                  ${active === item.name ? "border-r-4 border-[#0d1321] bg-white" : "hover:bg-gray-100"}`}
-              >
-                <div className="p-2 rounded-md bg-[#fde9df]">{item.icon}</div>
-                {isSidebarExpanded && <span className="font-medium">{item.name}</span>}
-              </button>
-            ))}
-            {menuItems.length === 0 && (
-              <div className="p-3 text-center text-gray-500 text-sm">
-                Loading menu...
-              </div>
-            )}
-          </nav>
+<nav className="flex flex-col gap-1 p-2">
+  {menuItems.length > 0 && menuItems.map((item) => (
+    <button
+      key={item.name}
+      onClick={() => {
+        setActive(item.name);
+        setIsSidebarOpen(false);
+      }}
+      className={`flex items-center gap-3 p-3 rounded-md transition-all duration-200 w-full text-left cursor-pointer
+        ${active === item.name ? "border-r-4 border-[#0d1321] bg-white" : "hover:bg-gray-100"}`}
+    >
+      <div className="p-2 rounded-md bg-[#fde9df]">{item.icon}</div>
+      {isSidebarExpanded && <span className="font-medium">{item.name}</span>}
+    </button>
+  ))}
+  {menuItems.length === 0 && (
+    <div className="p-3 text-center text-gray-500 text-sm">
+      Loading menu...
+    </div>
+  )}
+</nav>
+
         </div>
 
         {/* Logout */}
@@ -94,11 +95,11 @@ const menuItems = role ? menuItemsByRole[role] || [] : [];
             dispatch(logout());
             
             setIsSidebarOpen(false);
-            //الذهاب لصفحة التسجيل الدخول بعد تسجيل الخروج
-            window.location.href = '/auth/login';  // تأكد من تعديل الرابط حسب مسار صفحة تسجيل الدخول في تطبيقك
+ 
+            window.location.href = '/auth';  
         
            }}
-          className="flex items-center gap-3 w-full p-3 rounded-md hover:bg-gray-100 transition"
+          className="flex items-center gap-3 w-full p-3 rounded-md hover:bg-gray-100 transition cursor-pointer"
         >
           <div className="p-2 rounded-md bg-[#fde9df]">
             <IoMdLogOut size={22} />
