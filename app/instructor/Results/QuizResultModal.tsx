@@ -1,13 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { QuizService } from "@/services/quiz.service";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { HiOutlineXMark } from "react-icons/hi2";
 import CustomPagination from "@/app/components/shared/CustomPagination";
-import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard"; // new import
+import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard";
+import { useAppSelector } from "@/store/hooks";
 
 interface QuizResultModalProps {
   isOpen: boolean;
   onClose: () => void;
+  quizId: string;
+  quizTitle: string;
 }
 
 interface QuizResult {
@@ -19,46 +21,58 @@ interface QuizResult {
   date: string;
 }
 
-export default function QuizResultModal({ isOpen, onClose }: QuizResultModalProps) {
-  const [loading, setLoading] = useState(false);
-  const [allResults, setAllResults] = useState<QuizResult[]>([]);
+export default function QuizResultModal({ 
+  isOpen, 
+  onClose, 
+  quizId, 
+  quizTitle 
+}: QuizResultModalProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    if (isOpen && allResults.length === 0) {
-      setLoading(true);
-      QuizService.getResult()
-        .then((res) => {
-          const formattedResults = res.data.map((item: any) => {
-            const totalScore = item.quiz.questions_number * item.quiz.score_per_question;
-            const userScore = item.participants?.[0]?.score || 0;
-            const percentage = totalScore > 0 ? Math.round((userScore / totalScore) * 100) : 0;
-            return {
-              _id: item.quiz._id,
-              title: item.quiz.title,
-              score: userScore,
-              totalScore: totalScore,
-              percentage: percentage,
-              date: item.quiz.closed_at || item.quiz.createdAt
-            };
-          });
-          setAllResults(formattedResults);
-        })
-        .catch((err) => {
-          console.error("❌ Error fetching quiz results:", err);
-        })
-        .finally(() => setLoading(false));
-    }
-  }, [isOpen, allResults.length]);
+  // ✅ استخدام البيانات من Redux بدلاً من API call جديد
+  const { result: resultsFromStore, loading } = useAppSelector(state => state.quiz);
 
-  const totalPages = Math.ceil(allResults.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentResults = allResults.slice(startIndex, startIndex + itemsPerPage);
+  // ✅ تحويل البيانات مرة واحدة مع useMemo
+  const allResults = useMemo((): QuizResult[] => {
+    if (!resultsFromStore) return [];
+    
+    return resultsFromStore
+      .filter((item: any) => item.quiz?._id === quizId) // تصفية للكويز المحدد
+      .map((item: any) => {
+        const totalScore = item.quiz.questions_number * item.quiz.score_per_question;
+        const userScore = item.participants?.[0]?.score || 0;
+        const percentage = totalScore > 0 ? Math.round((userScore / totalScore) * 100) : 0;
+        
+        return {
+          _id: item.quiz._id,
+          title: item.quiz.title,
+          score: userScore,
+          totalScore: totalScore,
+          percentage: percentage,
+          date: item.quiz.closed_at || item.quiz.createdAt
+        };
+      });
+  }, [resultsFromStore, quizId]);
 
+  // ✅ حساب البيانات الحالية مع useMemo
+  const { currentResults, totalPages } = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return {
+      currentResults: allResults.slice(startIndex, startIndex + itemsPerPage),
+      totalPages: Math.ceil(allResults.length / itemsPerPage)
+    };
+  }, [allResults, currentPage, itemsPerPage]);
+
+  // ✅ إعادة تعيين الصفحة عند فتح المودال
   useEffect(() => {
     if (isOpen) setCurrentPage(1);
   }, [isOpen]);
+
+  // ✅ مemo للـ pagination handler
+  const handlePageChange = useCallback((newPage: number) => {
+    setCurrentPage(newPage);
+  }, []);
 
   if (!isOpen) return null;
 
@@ -72,7 +86,9 @@ export default function QuizResultModal({ isOpen, onClose }: QuizResultModalProp
           <HiOutlineXMark className="w-6 h-6" />
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">Quiz Results ({allResults.length})</h2>
+        <h2 className="text-2xl font-bold mb-4">
+          {quizTitle} Results ({allResults.length})
+        </h2>
 
         {loading ? (
           <div className="flex flex-col gap-4">
@@ -81,7 +97,7 @@ export default function QuizResultModal({ isOpen, onClose }: QuizResultModalProp
             ))}
           </div>
         ) : allResults.length === 0 ? (
-          <p className="text-gray-500">No quiz results found.</p>
+          <p className="text-gray-500">No quiz results found for this quiz.</p>
         ) : (
           <div className="flex-1 flex flex-col">
             <div className="flex-1 overflow-auto mb-4">
@@ -98,9 +114,21 @@ export default function QuizResultModal({ isOpen, onClose }: QuizResultModalProp
                   {currentResults.map((result, index) => (
                     <tr key={result._id || index} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td className="border border-gray-300 dark:border-gray-600 px-4 py-2">{result.title}</td>
-                      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">{result.score} / {result.totalScore}</td>
-                      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">{result.percentage}%</td>
-                      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">{new Date(result.date).toLocaleString()}</td>
+                      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                        {result.score} / {result.totalScore}
+                      </td>
+                      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                        <span className={`px-2 py-1 rounded text-sm ${
+                          result.percentage >= 80 ? 'bg-green-100 text-green-800' :
+                          result.percentage >= 60 ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {result.percentage}%
+                        </span>
+                      </td>
+                      <td className="border border-gray-300 dark:border-gray-600 px-4 py-2 text-center">
+                        {new Date(result.date).toLocaleDateString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -108,7 +136,11 @@ export default function QuizResultModal({ isOpen, onClose }: QuizResultModalProp
             </div>
 
             {totalPages > 1 && (
-              <CustomPagination totalPages={totalPages} page={currentPage} setPage={setCurrentPage} />
+              <CustomPagination 
+                totalPages={totalPages} 
+                page={currentPage} 
+                setPage={handlePageChange} 
+              />
             )}
           </div>
         )}

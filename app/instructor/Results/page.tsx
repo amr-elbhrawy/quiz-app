@@ -1,8 +1,8 @@
 "use client";
-
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { FaChevronDown } from "react-icons/fa";
-import { QuizService } from "@/services/quiz.service";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchQuizResult } from "@/store/features/quiz/quizSlice";
 import CustomPagination from "@/app/components/shared/CustomPagination";
 import QuizResultModal from "./QuizResultModal";
 import LoadingSkeletonCard from "@/app/components/shared/LoadingSkeletonCard";
@@ -18,7 +18,8 @@ interface QuizResult {
   date: string;
 }
 
-function QuizResultAccordion({ 
+// ✅ memo مع تحسين أداء الأكورديون
+const QuizResultAccordion = React.memo(function QuizResultAccordion({ 
   result, 
   onView 
 }: { 
@@ -27,51 +28,47 @@ function QuizResultAccordion({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
-  const [maxHeight, setMaxHeight] = useState("0px");
 
-  useEffect(() => {
-    if (contentRef.current) {
-      setMaxHeight(isOpen ? `${contentRef.current.scrollHeight + 20}px` : "0px");
-    }
-  }, [isOpen, result]);
+  const handleToggle = useCallback(() => setIsOpen(prev => !prev), []);
+  const handleViewClick = useCallback(() => onView(result), [result, onView]);
+
+  // ✅ تحسين الأنيميشن
+  const maxHeight = isOpen ? 'auto' : '0px';
+  const opacity = isOpen ? 'opacity-100' : 'opacity-0';
 
   return (
     <div className="border border-gray-300 rounded-lg shadow-sm bg-white overflow-hidden">
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className="w-full flex justify-between items-center px-4 py-3 text-left hover:bg-gray-50 transition-colors"
         aria-expanded={isOpen}
       >
         <span className="font-semibold truncate pr-2">{result.title}</span>
-        <FaChevronDown className={`text-orange-500 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+        <FaChevronDown className={`text-orange-500 transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`} />
       </button>
 
       <div
-        style={{ 
-          maxHeight,
-          transition: "max-height 0.4s ease, opacity 0.3s ease-in-out"
-        }}
-        className="bg-gray-50 overflow-hidden"
+        className={`bg-gray-50 transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96' : 'max-h-0'} overflow-hidden`}
       >
-        <div className={`px-4 py-3 space-y-2 ${isOpen ? "opacity-100" : "opacity-0"}`}>
+        <div ref={contentRef} className={`px-4 py-3 space-y-2 transition-opacity duration-200 ${opacity}`}>
           <p><span className="font-semibold">Group: </span>{result.group.name}</p>
           <p>
             <span className="font-semibold">Members: </span>
-            <span className="badge bg-blue-100 text-blue-800">
+            <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm">
               {result.group.members} persons
             </span>
           </p>
           <p>
             <span className="font-semibold">Participants: </span>
-            <span className="badge bg-green-100 text-green-800">
+            <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
               {result.participants}
             </span>
           </p>
           <p><span className="font-semibold">Date: </span>{result.date}</p>
 
           <button
-            className="btn-primary mt-4"
-            onClick={() => onView(result)}
+            className="bg-[#9BBE3F] hover:bg-[#8AA835] text-white px-4 py-2 rounded text-sm transition-colors mt-4"
+            onClick={handleViewClick}
           >
             View Results
           </button>
@@ -79,62 +76,102 @@ function QuizResultAccordion({
       </div>
     </div>
   );
-}
+});
 
 export default function QuizResultsTable() {
-  const [results, setResults] = useState<QuizResult[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useAppDispatch();
+  const { result: resultsFromStore, loading, error } = useAppSelector((state) => state.quiz);
+
   const [page, setPage] = useState(1);
-  const [fade, setFade] = useState(true);
   const [selectedQuiz, setSelectedQuiz] = useState<{ id: string; title: string } | null>(null);
 
   const itemsPerPage = 5;
-  const currentData = results.slice((page - 1) * itemsPerPage, page * itemsPerPage);
-  const totalPages = Math.ceil(results.length / itemsPerPage);
 
-  const fetchResults = async () => {
-    try {
-      const res = await QuizService.getResult();
-      const formattedResults = res.data.map((item: any) => ({
-        _id: item._id || `result-${Math.random().toString(36).substr(2, 9)}`,
-        title: item.quiz?.title || 'Untitled Quiz',
-        group: { 
-          name: item.group?.name || 'Group 1', 
-          members: item.group?.members || 0 
-        },
-        participants: Array.isArray(item.participants) ? item.participants.length : 0,
-        date: new Date(item.quiz?.createdAt || Date.now()).toLocaleDateString('en-GB')
-      }));
-      setResults(formattedResults);
-    } catch (err) {
-      console.error("Error fetching quiz results:", err);
-    } finally {
-      setLoading(false);
+  // ✅ جلب البيانات مرة واحدة فقط
+  useEffect(() => {
+    if (!resultsFromStore && !loading) {
+      dispatch(fetchQuizResult());
     }
-  };
+  }, [dispatch, resultsFromStore, loading]);
 
-  useEffect(() => { 
-    fetchResults(); 
+  // ✅ تحويل البيانات مع useMemo لتجنب المعالجة المتكررة
+  const formattedResults: QuizResult[] = useMemo(() => {
+    if (!resultsFromStore) return [];
+    
+    // تجميع النتائج حسب الكويز لتجنب التكرار
+    const uniqueQuizzes = new Map();
+    
+    resultsFromStore.forEach((item: any) => {
+      const quizId = item.quiz?._id || item._id;
+      if (!uniqueQuizzes.has(quizId)) {
+        uniqueQuizzes.set(quizId, {
+          _id: quizId,
+          title: item.quiz?.title || "Untitled Quiz",
+          group: { 
+            name: item.group?.name || "Unknown Group", 
+            members: item.group?.members || 0 
+          },
+          participants: Array.isArray(item.participants) ? item.participants.length : 0,
+          date: new Date(item.quiz?.createdAt || Date.now()).toLocaleDateString("en-GB"),
+        });
+      }
+    });
+    
+    return Array.from(uniqueQuizzes.values());
+  }, [resultsFromStore]);
+
+  // ✅ تحسين الـ pagination
+  const { currentData, totalPages } = useMemo(() => {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    
+    return {
+      currentData: formattedResults.slice(startIndex, endIndex),
+      totalPages: Math.ceil(formattedResults.length / itemsPerPage)
+    };
+  }, [formattedResults, page, itemsPerPage]);
+
+  const handleViewClick = useCallback((result: QuizResult) => {
+    setSelectedQuiz({ id: result._id, title: result.title });
   }, []);
 
-  const handleViewClick = (result: QuizResult) => {
-    setSelectedQuiz({ id: result._id, title: result.title });
-  };
+  const handlePageChange = useCallback((newPage: number) => {
+    setPage(newPage);
+  }, []);
 
-  const handlePageChange = (newPage: number) => {
-    setFade(false);
-    setTimeout(() => { 
-      setPage(newPage); 
-      setFade(true); 
-    }, 200);
-  };
+  const handleCloseModal = useCallback(() => {
+    setSelectedQuiz(null);
+  }, []);
 
-  if (loading) {
+  // ✅ تحسين معالجة حالات التحميل والخطأ
+  if (loading && !resultsFromStore) {
     return (
       <div className="p-4 sm:p-6 space-y-4">
+        <div className="h-8 bg-gray-200 animate-pulse rounded mb-6"></div>
         {Array.from({ length: itemsPerPage }).map((_, i) => (
           <LoadingSkeletonCard key={i} height="80px" />
         ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 sm:p-6">
+        <div className="text-red-500 bg-red-50 p-4 rounded-lg">
+          Error loading quiz results: {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!formattedResults.length) {
+    return (
+      <div className="p-4 sm:p-6">
+        <h2 className="text-xl font-bold mb-6">Quiz Results</h2>
+        <div className="text-gray-500 text-center py-8">
+          No quiz results found.
+        </div>
       </div>
     );
   }
@@ -167,17 +204,25 @@ export default function QuizResultsTable() {
               <th className="p-3 text-left">Actions</th>
             </tr>
           </thead>
-          <tbody className={`${fade ? "opacity-100" : "opacity-0"}`}>
+          <tbody>
             {currentData.map(result => (
-              <tr key={result._id} className="hover:bg-gray-50 border-b">
+              <tr key={result._id} className="hover:bg-gray-50 border-b transition-colors">
                 <td className="p-3 truncate max-w-xs">{result.title}</td>
                 <td className="p-3">{result.group.name}</td>
                 <td className="p-3">{result.group.members}</td>
-                <td className="p-3">{result.participants}</td>
+                <td className="p-3">
+                  <span className="inline-block px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
+                    {result.participants}
+                  </span>
+                </td>
                 <td className="p-3">{result.date}</td>
                 <td className="p-3">
-                  <button className="cursor-pointer bg-[#9BBE3F] hover:bg-[#8AA835] text-white px-3 py-1 rounded text-sm" onClick={() => handleViewClick(result)}>View</button>
-
+                  <button 
+                    className="bg-[#9BBE3F] hover:bg-[#8AA835] text-white px-3 py-1 rounded text-sm transition-colors" 
+                    onClick={() => handleViewClick(result)}
+                  >
+                    View
+                  </button>
                 </td>
               </tr>
             ))}
@@ -186,18 +231,20 @@ export default function QuizResultsTable() {
       </div>
 
       {/* Pagination */}
-      <CustomPagination 
-        totalPages={totalPages} 
-        page={page} 
-        setPage={handlePageChange} 
-        className="mt-6"
-      />
+      {totalPages > 1 && (
+        <CustomPagination 
+          totalPages={totalPages} 
+          page={page} 
+          setPage={handlePageChange} 
+          className="mt-6"
+        />
+      )}
 
       {/* Modal */}
       {selectedQuiz && (
         <QuizResultModal
           isOpen={!!selectedQuiz}
-          onClose={() => setSelectedQuiz(null)}
+          onClose={handleCloseModal}
           quizId={selectedQuiz.id}
           quizTitle={selectedQuiz.title}
         />

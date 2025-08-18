@@ -7,7 +7,18 @@ export const GroupService = {
   getAll: () => axiosInstance.get(GROUP_URL.GET_ALL),
 
   // Get group by ID
-  getById: (id: string) => axiosInstance.get(GROUP_URL.GET_BY_ID(id)),
+//     "_id": "68a32a2344dab7b8cb09fb8f",
+//     "name": "B",
+//     "status": "active",
+//     "instructor": "6883dee944dab7b8cb0287b6",
+//     "students": [],
+//     "max_students": 25
+// }
+getById: (id: string) => {
+  console.log("Fetching group by ID:", `/api/group/${id}`);
+  return axiosInstance.get(GROUP_URL.GET_BY_ID(id));
+},
+
 
   // Create new group
   // Example body:

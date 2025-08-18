@@ -3,11 +3,18 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Modal, ModalContent, ModalHeader, ModalBody } from "@heroui/react";
 import { HiOutlineXMark, HiCheck } from "react-icons/hi2";
-import { QuizService } from "@/services/quiz.service";
-import { StudentService } from "@/services/student.service";
 import { toast } from "react-toastify";
 import { useState, useEffect } from "react";
-import QuizCodeModal from "./QuizCodeModal";
+import { useDispatch, useSelector } from "react-redux";
+import { createQuiz } from "@/store/features/quiz/quizSlice";
+import { StudentService } from "@/services/student.service";
+import type { RootState, AppDispatch } from "@/store/store";
+import dynamic from "next/dynamic";
+
+// Lazy load QuizCodeModal
+const QuizCodeModal = dynamic(() => import("./QuizCodeModal"), {
+  loading: () => null
+});
 
 interface CreateQuizModalProps {
   isOpen: boolean;
@@ -33,6 +40,9 @@ export default function CreateQuizModal({
   onClose,
   onCreated,
 }: CreateQuizModalProps) {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading } = useSelector((state: RootState) => state.quiz);
+
   const {
     register,
     handleSubmit,
@@ -78,8 +88,10 @@ export default function CreateQuizModal({
       }
     };
 
-    fetchGroupsFromStudents();
-  }, []);
+    if (isOpen) {
+      fetchGroupsFromStudents();
+    }
+  }, [isOpen]);
 
   const onSubmit: SubmitHandler<QuizFormInputs> = async (data) => {
     try {
@@ -96,33 +108,36 @@ export default function CreateQuizModal({
       };
 
       console.log("🚀 Creating quiz with payload:", payload);
-      const response = await QuizService.create(payload);
-      console.log("✅ Full quiz response:", response);
-      console.log("🔑 Quiz code from server:", response.data?.code);
-      console.log("📊 Complete response data:", response.data);
       
-      // استخدم الكود الفعلي من الـ server (مستوى أعمق)
-      const actualQuizCode = response.data?.data?.code || response.data?.code;
-      console.log("🎯 Actual code to display:", actualQuizCode);
+      const resultAction = await dispatch(createQuiz(payload));
       
-      if (!actualQuizCode) {
-        console.error("❌ No code received from server!");
-        toast.error("Quiz created but no code received!");
-        return;
+      if (createQuiz.fulfilled.match(resultAction)) {
+        const response = resultAction.payload;
+        console.log("✅ Full quiz response:", response);
+        
+        // استخدم الكود الفعلي من الـ server
+        const actualQuizCode = response?.data?.code || response?.code;
+        console.log("🎯 Actual code to display:", actualQuizCode);
+        
+        if (actualQuizCode) {
+          setCreatedQuizCode(actualQuizCode);
+          setQuizCodeModalOpen(true);
+        } else {
+          console.warn("⚠️ No code received from server");
+        }
+
+        reset();
+        onCreated();
+        onClose();
+      } else {
+        // Handle rejection
+        const error = resultAction.payload as string;
+        toast.error(error || "Failed to create quiz.");
       }
-
-      toast.success("Quiz created successfully!");
-      reset();
-      onCreated();
-      onClose();
-
-      // استخدم الكود الصحيح
-      setCreatedQuizCode(actualQuizCode);
-      setQuizCodeModalOpen(true);
       
     } catch (error: any) {
       console.error("❌ Error creating quiz:", error);
-      toast.error(error.response?.data?.message || "Failed to create quiz.");
+      toast.error("An unexpected error occurred");
     }
   };
 
@@ -141,6 +156,8 @@ export default function CreateQuizModal({
     </div>
   );
 
+  const isFormSubmitting = isSubmitting || loading;
+
   return (
     <>
       <Modal
@@ -158,8 +175,8 @@ export default function CreateQuizModal({
                 <button
                   onClick={handleSubmit(onSubmit)}
                   title="Save"
-                  className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-green-600"
-                  disabled={isSubmitting}
+                  className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isFormSubmitting}
                 >
                   <HiCheck size={24} />
                 </button>
@@ -169,8 +186,8 @@ export default function CreateQuizModal({
                     onClose();
                   }}
                   title="Close"
-                  className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-600"
-                  disabled={isSubmitting}
+                  className="cursor-pointer flex items-center justify-center w-12 h-12 border-l border-gray-300 hover:text-red-600 disabled:opacity-50"
+                  disabled={isFormSubmitting}
                 >
                   <HiOutlineXMark size={24} />
                 </button>
@@ -178,6 +195,15 @@ export default function CreateQuizModal({
             </ModalHeader>
 
             <ModalBody className="p-6 space-y-4">
+              {isFormSubmitting && (
+                <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+                    <span>Creating quiz...</span>
+                  </div>
+                </div>
+              )}
+
               <h3 className="font-semibold text-sm">Details</h3>
 
               <FieldGroup label="Title">
@@ -185,7 +211,7 @@ export default function CreateQuizModal({
                   {...register("title", { required: true })}
                   className="w-full px-4 py-3 outline-none"
                   type="text"
-                  disabled={isSubmitting}
+                  disabled={isFormSubmitting}
                 />
               </FieldGroup>
 
@@ -195,7 +221,7 @@ export default function CreateQuizModal({
                     {...register("duration", { valueAsNumber: true })}
                     className="w-full px-4 py-3 outline-none"
                     type="number"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   />
                 </FieldGroup>
                 <FieldGroup label="No. of questions">
@@ -203,7 +229,7 @@ export default function CreateQuizModal({
                     {...register("noOfQuestions", { valueAsNumber: true })}
                     className="w-full px-4 py-3 outline-none"
                     type="number"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   />
                 </FieldGroup>
                 <FieldGroup label="Score per question">
@@ -211,7 +237,7 @@ export default function CreateQuizModal({
                     {...register("scorePerQuestion", { valueAsNumber: true })}
                     className="w-full px-4 py-3 outline-none"
                     type="number"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   />
                 </FieldGroup>
               </div>
@@ -221,7 +247,7 @@ export default function CreateQuizModal({
                   {...register("description")}
                   className="w-full px-4 py-3 outline-none resize-none"
                   rows={3}
-                  disabled={isSubmitting}
+                  disabled={isFormSubmitting}
                 />
               </FieldGroup>
 
@@ -231,7 +257,7 @@ export default function CreateQuizModal({
                     {...register("scheduleDate")}
                     className="w-full px-4 py-3 outline-none"
                     type="date"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   />
                 </FieldGroup>
                 <FieldGroup label="Schedule time">
@@ -239,7 +265,7 @@ export default function CreateQuizModal({
                     {...register("scheduleTime")}
                     className="w-full px-4 py-3 outline-none"
                     type="time"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   />
                 </FieldGroup>
               </div>
@@ -249,7 +275,7 @@ export default function CreateQuizModal({
                   <select
                     {...register("difficulty")}
                     className="w-full px-4 py-3 outline-none"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   >
                     <option value="entry">Entry</option>
                     <option value="medium">Medium</option>
@@ -261,7 +287,7 @@ export default function CreateQuizModal({
                   <select
                     {...register("categoryType")}
                     className="w-full px-4 py-3 outline-none"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   >
                     <option value="FE">FE</option>
                     <option value="BE">BE</option>
@@ -272,7 +298,7 @@ export default function CreateQuizModal({
                   <select
                     {...register("group", { required: true })}
                     className="w-full px-4 py-3 outline-none"
-                    disabled={isSubmitting}
+                    disabled={isFormSubmitting}
                   >
                     <option value="">Select Group</option>
                     {groups.map((g) => (
@@ -288,11 +314,13 @@ export default function CreateQuizModal({
         </ModalContent>
       </Modal>
 
-      <QuizCodeModal
-        isOpen={quizCodeModalOpen}
-        onClose={() => setQuizCodeModalOpen(false)}
-        code={createdQuizCode}
-      />
+      {quizCodeModalOpen && (
+        <QuizCodeModal
+          isOpen={quizCodeModalOpen}
+          onClose={() => setQuizCodeModalOpen(false)}
+          code={createdQuizCode}
+        />
+      )}
     </>
   );
 }
