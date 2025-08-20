@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaEnvelope, FaLock, FaCheckCircle } from 'react-icons/fa';
 import { FiArrowLeft } from 'react-icons/fi';
@@ -21,6 +21,10 @@ export default function ResetPasswordPage() {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const { loading, error, successMsg } = useAppSelector((state) => state.auth);
+
+  // ✅ عرّف isLoaded هنا
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -28,7 +32,7 @@ export default function ResetPasswordPage() {
     formState: { errors },
   } = useForm<ResetPasswordInputs>();
 
- const onSubmit = (data: ResetPasswordInputs) => {
+  const onSubmit = (data: ResetPasswordInputs) => {
     dispatch(resetPasswordThunk(data));
   };
 
@@ -48,12 +52,14 @@ export default function ResetPasswordPage() {
   }, [error, successMsg, dispatch, reset, router]);
 
   return (
-    <div className={`w-full text-white transition-all duration-500 ease-in-out transform ${
-      isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-    }`}>
+    <div
+      className={`w-full text-white transition-all duration-500 ease-in-out transform ${
+        isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+      }`}
+    >
       {/* Back Button */}
-      <Link 
-        href="/auth/forget" 
+      <Link
+        href="/auth/forget"
         className="inline-flex items-center gap-2 text-lime-300 hover:text-lime-200 transition-all duration-300 hover:gap-3 mb-4"
       >
         <FiArrowLeft size={16} className="transition-transform duration-300 hover:-translate-x-1" />

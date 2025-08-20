@@ -1,8 +1,8 @@
-// Home.tsx - Redux Toolkit Version
+// Home.tsx - Fixed Navigation Version
 "use client";
 import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FaRegClock } from "react-icons/fa";
+import { FaRegClock, FaUsers } from "react-icons/fa";
 import { GiSave } from "react-icons/gi";
 import dynamic from "next/dynamic";
 import { toast } from "react-toastify";
@@ -27,7 +27,7 @@ const QuizDetails = dynamic(() => import("./QuizDetails"), {
   loading: () => <QuizDetailsSkeleton />
 });
 
-// Optimized skeletons
+// ✅ Optimized skeletons
 const QuizListSkeleton = memo(() => (
   <div className="border border-gray-300 rounded-lg p-4 animate-pulse">
     <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
@@ -56,7 +56,7 @@ const QuizDetailsSkeleton = memo(() => (
   </div>
 ));
 
-// Action Button Component
+// ✅ Action Button Component
 const ActionButton = memo(({ icon: Icon, title, onClick }: {
   icon: React.ComponentType<{ className?: string }>;
   title: string;
@@ -83,22 +83,21 @@ export default function Home({ setActive }: HomeProps) {
   // Redux state
   const { 
     incoming: quizzes, 
-    loading, 
     error, 
     successMessage 
   } = useSelector((state: RootState) => state.quiz);
   
-  // Local state - only for UI-specific things
+  // Local state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
-  // Fetch quizzes on mount and handle success/error messages
+  // ✅ Fetch quizzes
   useEffect(() => {
     dispatch(fetchIncomingQuizzes());
   }, [dispatch]);
 
-  // Handle success/error messages
+  // ✅ Handle success messages
   useEffect(() => {
     if (successMessage) {
       toast.success(successMessage);
@@ -106,6 +105,7 @@ export default function Home({ setActive }: HomeProps) {
     }
   }, [successMessage, dispatch]);
 
+  // ✅ Handle error messages
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -113,13 +113,11 @@ export default function Home({ setActive }: HomeProps) {
     }
   }, [error, dispatch]);
 
-  // Memoized handlers
+  // Handlers
   const handleQuizCreated = useCallback(() => {
     toast.success("Quiz created successfully!");
     setIsModalOpen(false);
-    // Trigger refresh by updating the trigger
     setRefreshTrigger(prev => prev + 1);
-    // Also refresh Redux state
     dispatch(fetchIncomingQuizzes());
   }, [dispatch]);
 
@@ -143,15 +141,19 @@ export default function Home({ setActive }: HomeProps) {
     setActive("Questions");
   }, [setActive]);
 
-  // Refresh handler for manual refresh
+  // ✅ FIXED: Navigate to AllQuizzes instead of Quizzes
+  const handleNavigateToQuizzes = useCallback(() => {
+    setActive("AllQuizzes");
+  }, [setActive]);
+
   const handleRefresh = useCallback(() => {
     dispatch(fetchIncomingQuizzes());
     setRefreshTrigger(prev => prev + 1);
   }, [dispatch]);
 
-  // Memoized action buttons
+  // ✅ Action buttons
   const actionButtons = useMemo(() => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <ActionButton
         icon={FaRegClock}
         title="Set up a new quiz"
@@ -162,10 +164,15 @@ export default function Home({ setActive }: HomeProps) {
         title="Question Bank"
         onClick={handleNavigateToQuestions}
       />
+      <ActionButton
+        icon={FaUsers}
+        title="All Quizzes"
+        onClick={handleNavigateToQuizzes}
+      />
     </div>
-  ), [handleOpenModal, handleNavigateToQuestions]);
+  ), [handleOpenModal, handleNavigateToQuestions, handleNavigateToQuizzes]);
 
-  // Early return for quiz details
+  // ✅ Quiz details view
   if (selectedQuizId) {
     return (
       <QuizDetails 
@@ -177,6 +184,12 @@ export default function Home({ setActive }: HomeProps) {
 
   return (
     <div className="p-4 sm:p-6">
+      {/* ✅ Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-800">Quiz Management</h1>
+        <p className="text-gray-600 mt-1">Create, manage, and monitor your quizzes</p>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left Column */}
         <div className="flex flex-col gap-6">
@@ -187,7 +200,7 @@ export default function Home({ setActive }: HomeProps) {
         <div className="flex flex-col gap-6">
           <UpcomingQuizzes 
             onOpenQuiz={handleOpenQuiz}
-            onJoin={handleOpenQuiz} // For students, same handler
+            onJoin={handleOpenQuiz}
             refreshTrigger={refreshTrigger}
           />
           <CompletedQuizzes />

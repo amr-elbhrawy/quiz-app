@@ -115,30 +115,49 @@ export default function CreateQuizModal({
         const response = resultAction.payload;
         console.log("✅ Full quiz response:", response);
         
-        // استخدم الكود الفعلي من الـ server
-        const actualQuizCode = response?.data?.code || response?.code;
+        // Try multiple possible paths for the quiz code
+        const actualQuizCode = response?.data?.code || 
+                              response?.code || 
+                              response?.data?.quiz?.code ||
+                              response?.quiz?.code;
+        
         console.log("🎯 Actual code to display:", actualQuizCode);
         
         if (actualQuizCode) {
           setCreatedQuizCode(actualQuizCode);
+          console.log("🔥 Setting quiz code modal to open with code:", actualQuizCode);
+          
+          // Don't close the create modal yet - open code modal first
           setQuizCodeModalOpen(true);
         } else {
-          console.warn("⚠️ No code received from server");
+          console.warn("⚠️ No code received from server, response:", response);
+          toast.success("Quiz created successfully!");
+          reset();
+          onCreated();
+          onClose();
         }
-
-        reset();
-        onCreated();
-        onClose();
       } else {
         // Handle rejection
         const error = resultAction.payload as string;
         toast.error(error || "Failed to create quiz.");
+        console.error("❌ Quiz creation failed:", resultAction.payload);
       }
       
     } catch (error: any) {
       console.error("❌ Error creating quiz:", error);
       toast.error("An unexpected error occurred");
     }
+  };
+
+  // Handle quiz code modal close
+  const handleQuizCodeModalClose = () => {
+    setQuizCodeModalOpen(false);
+    setCreatedQuizCode(""); // Clear the code after closing
+    
+    // Now close the create modal and trigger callbacks
+    reset();
+    onCreated();
+    onClose();
   };
 
   const FieldGroup = ({
@@ -161,7 +180,7 @@ export default function CreateQuizModal({
   return (
     <>
       <Modal
-        isOpen={isOpen}
+        isOpen={isOpen && !quizCodeModalOpen} // Don't show create modal when code modal is open
         placement="top-center"
         onOpenChange={onClose}
         hideCloseButton
@@ -314,13 +333,12 @@ export default function CreateQuizModal({
         </ModalContent>
       </Modal>
 
-      {quizCodeModalOpen && (
-        <QuizCodeModal
-          isOpen={quizCodeModalOpen}
-          onClose={() => setQuizCodeModalOpen(false)}
-          code={createdQuizCode}
-        />
-      )}
+      {/* Quiz Code Modal - Render outside the main modal */}
+      <QuizCodeModal
+        isOpen={quizCodeModalOpen}
+        onClose={handleQuizCodeModalClose}
+        code={createdQuizCode}
+      />
     </>
   );
 }

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface FormData {
   password: string;
@@ -18,6 +19,9 @@ interface FormData {
 
 const ChangePasswordPage = () => {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showCurrent, setShowCurrent] = useState(false);
+  const [showNew, setShowNew] = useState(false);
+
   const dispatch = useAppDispatch();
   const router = useRouter();
 
@@ -31,17 +35,11 @@ const ChangePasswordPage = () => {
 
   useEffect(() => {
     setIsLoaded(true);
-    if (error) {
-      toast.error(error);
-    }
-
+    if (error) toast.error(error);
     if (successMsg) {
       toast.success(successMsg);
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 1500);
+      setTimeout(() => router.push('/dashboard'), 1500);
     }
-
     return () => {
       dispatch(clearAuthMessages());
     };
@@ -53,7 +51,7 @@ const ChangePasswordPage = () => {
     }`}>
       {/* Back Button */}
       <Link 
-        href="/dashboard" 
+        href="/auth" 
         className="inline-flex items-center gap-2 text-lime-300 hover:text-lime-200 transition-all duration-300 hover:gap-3 mb-4"
       >
         <FiArrowLeft size={16} className="transition-transform duration-300 hover:-translate-x-1" />
@@ -69,42 +67,62 @@ const ChangePasswordPage = () => {
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         {/* Current Password */}
-        <InputShared
-          register={register}
-          name="password"
-          type="password"
-          validation={{ required: 'The current password is required' }}
-          iconInput={<RiLockPasswordLine className="text-gray-500" />}
-          label="Current password"
-          placeholder="Type your current password"
-        />
-        {errors.password && (
-          <p className="text-red-500 ml-2 text-sm capitalize">
-            {errors.password.message}
-          </p>
-        )}
+<div className="relative">
+  <InputShared
+    register={register}
+    name="password"
+    type={showCurrent ? "text" : "password"}
+    validation={{ required: 'The current password is required' }}
+    iconInput={<RiLockPasswordLine className="text-gray-500" />}
+    label="Current password"
+    placeholder="Type your current password"
+  />
+<span 
+  onClick={() => setShowCurrent(!showCurrent)} 
+  className="absolute right-3 top-1/2   cursor-pointer text-lime-400 hover:text-lime-300 transition"
+>
+  {showCurrent ? <FaEyeSlash size={20}/> : <FaEye size={20}/>}
+</span>
+
+</div>
+{errors.password && (
+  <p className="text-red-500 ml-2 text-sm capitalize">
+    {errors.password.message}
+  </p>
+)}
+
 
         {/* New Password */}
-        <InputShared
-          register={register}
-          name="password_new"
-          type="password"
-          validation={{ 
-            required: 'The new password is required',
-            minLength: {
-              value: 6,
-              message: 'New password must be at least 6 characters'
-            }
-          }}
-          iconInput={<RiLockPasswordLine className="text-gray-500" />}
-          label="New password"
-          placeholder="Type your new password"
-        />
-        {errors.password_new && (
-          <p className="text-red-500 ml-2 text-sm capitalize">
-            {errors.password_new.message}
-          </p>
-        )}
+       <div className="relative">
+  <InputShared
+    register={register}
+    name="password_new"
+    type={showNew ? "text" : "password"}
+    validation={{ 
+      required: 'The new password is required',
+      minLength: {
+        value: 6,
+        message: 'New password must be at least 6 characters'
+      }
+    }}
+    iconInput={<RiLockPasswordLine className="text-gray-500" />}
+    label="New password"
+    placeholder="Type your new password"
+  />
+<span 
+  onClick={() => setShowNew(!showNew)} 
+  className="absolute right-3 top-2/4  cursor-pointer text-lime-400 hover:text-lime-300 transition"
+>
+  {showNew ? <FaEyeSlash size={20}/> : <FaEye size={20}/>}
+</span>
+
+</div>
+{errors.password_new && (
+  <p className="text-red-500 ml-2 text-sm capitalize">
+    {errors.password_new.message}
+  </p>
+)}
+
 
         {/* Submit Button */}
         <div className="flex justify-center pt-4">

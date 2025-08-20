@@ -1,10 +1,11 @@
-// DashboardLayout.tsx - النسخة المحسنة
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useSelector, shallowEqual } from "react-redux";
 import dynamic from 'next/dynamic';
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import HelpModal from "../Help/HelpModal";
+import MyQuizResults from "@/app/learner/MyQuizResults/MyQuizResults";
 
 // Lazy load heavy components - هيقلل الـ bundle size
 const Students = dynamic(() => import("@/app/instructor/students/page"), {
@@ -16,6 +17,10 @@ const Groups = dynamic(() => import("@/app/instructor/group/GroupsList"), {
 const Quizzes = dynamic(() => import("@/app/instructor/Quizzes/page"), {
   loading: () => <OptimizedSkeleton />
 });
+const QuizzesTable = dynamic(() => import("@/app/instructor/Quizzes/QuizzesTable"), {
+  loading: () => <OptimizedSkeleton />
+});
+
 const JoinQuiz = dynamic(() => import("@/app/learner/JoinQuiz/page"), {
   loading: () => <OptimizedSkeleton />
 });
@@ -66,6 +71,7 @@ function DashboardLayout() {
   const [finalScore, setFinalScore] = useState<number | null>(null);
   const [finalTotal, setFinalTotal] = useState<number | null>(null);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
+  const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
   // Optimized selectors - بدل 3 selectors منفصلة
   const { loadingUser, role, user }: DashboardState = useSelector(
@@ -99,6 +105,14 @@ function DashboardLayout() {
     setIsScoreModalOpen(true);
   }, []);
 
+  const handleHelp = useCallback(() => {
+    setIsHelpModalOpen(true);
+  }, []);
+
+  const handleCloseHelpModal = useCallback(() => {
+    setIsHelpModalOpen(false);
+  }, []);
+
   useEffect(() => {
     if (role && !loadingUser) setActive("Dashboard");
   }, [role, loadingUser]);
@@ -122,7 +136,27 @@ function DashboardLayout() {
       case "Groups":
         return <Groups />;
       case "Quizzes":
-        return <Quizzes setActive={setActive} />;
+        // ✅ Show Home component when "Quizzes" is clicked from sidebar
+        return (
+          <Quizzes setActive={setActive} />
+        );
+      case "AllQuizzes":
+        // ✅ Show QuizzesTable when "All Quizzes" button is clicked in Home
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">All Quizzes</h1>
+              <button
+                onClick={() => setActive("Quizzes")}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                ← Back to Quizzes
+              </button>
+            </div>
+            <QuizzesTable />
+          </div>
+        );
+
       case "Questions":
         return <Questions />;
       case "Results":
@@ -135,6 +169,7 @@ function DashboardLayout() {
         );
     }
   }, [active, selectedQuizId, handleQuizSelect, handleBackToDashboard]);
+
 
   // Memoized student content
   const studentContent = useMemo(() => {
@@ -159,6 +194,9 @@ function DashboardLayout() {
         );
       case "JoinQuiz":
         return <JoinQuiz onSolveQuiz={handleStartQuiz} />;
+        case "Results":
+  return <MyQuizResults />;
+
       default:
         return (
           <div className="p-6 text-center text-gray-500">
@@ -213,6 +251,7 @@ function DashboardLayout() {
         setActive={setActive}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
+        onHelp={handleHelp}
       />
       <div className="flex-1 flex flex-col min-w-0 w-full">
         <Navbar setIsSidebarOpen={setIsSidebarOpen} active={active} />
@@ -239,6 +278,8 @@ function DashboardLayout() {
           onClose={() => setIsScoreModalOpen(false)}
         />
       )}
+
+      <HelpModal isOpen={isHelpModalOpen} onClose={handleCloseHelpModal} />
     </div>
   );
 }

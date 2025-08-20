@@ -39,7 +39,7 @@ const ForgetPasswordPage = () => {
 
     if (successMsg) {
       toast.success(successMsg);
-      setTimeout(() => router.push('/auth'), 300);
+      setTimeout(() => router.push('/auth/reset'), 300);
     }
 
     return () => {
