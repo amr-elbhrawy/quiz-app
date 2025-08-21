@@ -16,7 +16,7 @@ interface QuizState {
   quiz: any | null;
   result: any | null;
   
-  // ✅ NEW: Paginated results
+  //     NEW: Paginated results
   paginatedResults: PaginatedData<any> | null;
   resultsLoading: boolean;
   resultsError: string | null;
@@ -45,7 +45,7 @@ const initialState: QuizState = {
   successMessage: null,
 };
 
-// ✅ NEW: Fetch paginated results
+//     NEW: Fetch paginated results
 export const fetchPaginatedResults = createAsyncThunk(
   "quiz/fetchPaginatedResults",
   async (
@@ -78,7 +78,7 @@ export const fetchPaginatedResults = createAsyncThunk(
   }
 );
 
-// ✅ OPTIMIZED: Lightweight initial load
+//     OPTIMIZED: Lightweight initial load
 export const fetchResultsSummary = createAsyncThunk(
   "quiz/fetchResultsSummary",
   async (_, { rejectWithValue }) => {
@@ -195,7 +195,7 @@ export const fetchQuizWithoutAnswers = createAsyncThunk(
   }
 );
 
-// ✅ LEGACY: Keep for backward compatibility
+//     LEGACY: Keep for backward compatibility
 export const fetchQuizResult = createAsyncThunk(
   "quiz/result",
   async (_, { getState, rejectWithValue }) => {
@@ -273,7 +273,7 @@ const quizSlice = createSlice({
     clearSuccessMessage: (state) => {
       state.successMessage = null;
     },
-    // ✅ NEW: Update single result in cache
+    //     NEW: Update single result in cache
     updateResultInCache: (state, action: PayloadAction<any>) => {
       if (state.paginatedResults) {
         const index = state.paginatedResults.data.findIndex(
@@ -307,7 +307,7 @@ const quizSlice = createSlice({
       state.resultsError = action.payload as string;
     };
 
-    // ✅ NEW: Paginated results
+    //     NEW: Paginated results
     builder.addCase(fetchPaginatedResults.pending, resultsPending);
     builder.addCase(fetchPaginatedResults.fulfilled, (state, action) => {
       state.resultsLoading = false;
@@ -315,7 +315,7 @@ const quizSlice = createSlice({
     });
     builder.addCase(fetchPaginatedResults.rejected, resultsRejected);
 
-    // ✅ NEW: Results summary
+    //     NEW: Results summary
     builder.addCase(fetchResultsSummary.pending, resultsPending);
     builder.addCase(fetchResultsSummary.fulfilled, (state, action) => {
       state.resultsLoading = false;

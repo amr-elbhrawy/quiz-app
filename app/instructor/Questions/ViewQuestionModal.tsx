@@ -7,7 +7,7 @@ import { FaEye } from "react-icons/fa";
 interface ViewQuestionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  question: any; // السؤال المراد عرضه
+  question: any;  
 }
 
 export default function ViewQuestionModal({

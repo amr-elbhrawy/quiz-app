@@ -24,7 +24,7 @@ interface QuestionFormInputs {
   type: "FE" | "BE";
 }
 
-// ✅ Memoized Field Group Component
+//   Memoized Field Group Component
 const FieldGroup = React.memo(({
   label,
   error,
@@ -72,10 +72,10 @@ export default function CreateQuestionModal({
     },
   });
 
-  // ✅ Watch form values for validation feedback
+  //   Watch form values for validation feedback
   const watchedAnswer = watch("answer");
 
-  // ✅ Memoized form submission
+  //   Memoized form submission
   const onSubmit: SubmitHandler<QuestionFormInputs> = useCallback(async (data) => {
     try {
       await dispatch(createQuestion(data)).unwrap();
@@ -88,7 +88,7 @@ export default function CreateQuestionModal({
     }
   }, [dispatch, reset, onCreated, onClose]);
 
-  // ✅ Memoized close handler
+  //   Memoized close handler
   const handleClose = useCallback(() => {
     if (!isSubmitting && !loading) {
       reset();
@@ -96,14 +96,14 @@ export default function CreateQuestionModal({
     }
   }, [isSubmitting, loading, reset, onClose]);
 
-  // ✅ Memoized textarea auto-resize handler
+  //   Memoized textarea auto-resize handler
   const handleTextareaResize = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
     const target = e.target as HTMLTextAreaElement;
     target.style.height = "auto";
     target.style.height = target.scrollHeight + "px";
   }, []);
 
-  // ✅ Memoized options for selects
+  //   Memoized options for selects
   const difficultyOptions = useMemo(() => [
     { value: "easy", label: "Easy" },
     { value: "medium", label: "Medium" },
@@ -302,8 +302,7 @@ export default function CreateQuestionModal({
               </select>
             </FieldGroup>
 
-            {/* Submit button (hidden, form submits via header button) */}
-            <button type="submit" className="hidden" disabled={isFormDisabled} />
+             <button type="submit" className="hidden" disabled={isFormDisabled} />
           </form>
 
           {/* Loading indicator */}

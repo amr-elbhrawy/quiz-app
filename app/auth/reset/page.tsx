@@ -22,8 +22,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const { loading, error, successMsg } = useAppSelector((state) => state.auth);
 
-  // ✅ عرّف isLoaded هنا
-  const [isLoaded, setIsLoaded] = useState(false);
+   const [isLoaded, setIsLoaded] = useState(false);
 
   const {
     register,

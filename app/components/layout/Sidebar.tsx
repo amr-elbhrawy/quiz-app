@@ -19,8 +19,7 @@ const Sidebar = React.memo(({ active, setActive, isSidebarOpen, setIsSidebarOpen
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
   const dispatch = useDispatch();
 
-  // جلب الـ role من Redux
-  const rawRole = useSelector((state: any) => state.auth.user?.role);
+   const rawRole = useSelector((state: any) => state.auth.user?.role);
   const role = rawRole ? rawRole.toLowerCase() : "";
 
   const menuItemsByRole = {

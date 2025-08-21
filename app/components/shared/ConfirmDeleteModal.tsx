@@ -31,7 +31,7 @@ export default function ConfirmDeleteModal({
       placement="top-center" 
       onOpenChange={onClose} 
       hideCloseButton
-      isDismissable={!isLoading} // منع الإغلاق أثناء التحميل
+      isDismissable={!isLoading} 
     >
       <ModalContent>
         <>

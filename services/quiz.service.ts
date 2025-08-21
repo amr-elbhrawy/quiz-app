@@ -1,7 +1,7 @@
 import { axiosInstance } from './api';
 import { QUIZ_URL } from './endpoints';
 
-// ✅ Cache بسيط للنتائج
+//   Cache 
 const resultsCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 دقائق
 
@@ -42,7 +42,7 @@ export const QuizService = {
     group: string;
   }) => axiosInstance.post(QUIZ_URL.CREATE, data),
   
-  // Update quiz - مع تصفية الحقول الآمنة
+  // Update quiz - 
   update: (id: string, data: any) => {
     const safeFields = {
       title: data.title,
@@ -102,15 +102,14 @@ export const QuizService = {
       });
   },
   
-  // ✅ NEW: Get paginated quiz results مع caching
-  getResultsPaginated: async (params: QuizResultsParams = {}): Promise<PaginatedResponse<any>> => {
+   getResultsPaginated: async (params: QuizResultsParams = {}): Promise<PaginatedResponse<any>> => {
     const { page = 1, limit = 10, search, sortBy = 'date', sortOrder = 'desc' } = params;
     
-    // إنشاء cache key
+    //   cache key
     const cacheKey = JSON.stringify({ page, limit, search, sortBy, sortOrder });
     const now = Date.now();
     
-    // فحص الـ cache
+    //   فحص الـ cache
     if (resultsCache.has(cacheKey)) {
       const cached = resultsCache.get(cacheKey);
       if (now - cached.timestamp < CACHE_DURATION) {
@@ -120,7 +119,7 @@ export const QuizService = {
     }
     
     try {
-      // إنشاء query parameters
+      //   query parameters
       const queryParams = new URLSearchParams({
         page: page.toString(),
         limit: limit.toString(),
@@ -147,8 +146,7 @@ export const QuizService = {
     }
   },
   
-  // ✅ OLD: Get all results (fallback)
-  getResult: () => {
+   getResult: () => {
     console.warn('⚠️ Using old getResult method - consider using getResultsPaginated');
     return axiosInstance.get(QUIZ_URL.RESULT);
   },
@@ -165,13 +163,13 @@ export const QuizService = {
     data: { group: string; schadule: string; duration: number }
   ) => axiosInstance.put(QUIZ_URL.REASSIGN(quizId), data),
   
-  // ✅ Clear cache utility
+  //     Clear cache utility
   clearResultsCache: () => {
     resultsCache.clear();
     console.log('🧹 Results cache cleared');
   },
   
-  // ✅ Get specific quiz results
+  //     Get specific quiz results
   getQuizResults: async (quizId: string, page = 1, limit = 10) => {
     try {
       const queryParams = new URLSearchParams({

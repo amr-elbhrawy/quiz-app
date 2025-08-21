@@ -1,15 +1,23 @@
 'use client';
-import React, { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { FaChevronDown } from "react-icons/fa";
+import { IoMdLogOut } from "react-icons/io";
+import { logout } from "@/store/features/auth/authSlice";
 
-export default function Navbar({ setIsSidebarOpen, active }) {
+interface NavbarProps {
+  setIsSidebarOpen: (isOpen: boolean) => void;
+  active: string;
+}
+
+export default function Navbar({ setIsSidebarOpen, active }: NavbarProps) {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const user = useSelector((state: any) => state.auth.user);
+  const dispatch = useDispatch();
   const menuRef = useRef<HTMLDivElement>(null);
 
   const fullName = `${user?.first_name || ""} ${user?.last_name || ""}`.trim() || "Guest";
- 
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -19,6 +27,12 @@ export default function Navbar({ setIsSidebarOpen, active }) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = useCallback(() => {
+    dispatch(logout());
+    setIsProfileMenuOpen(false);
+    window.location.href = '/auth';
+  }, [dispatch]);
 
   return (
     <header className="bg-white border-b border-gray-100">
@@ -51,10 +65,11 @@ export default function Navbar({ setIsSidebarOpen, active }) {
             {isProfileMenuOpen && (
               <div className="absolute end-0 z-10 mt-0.5 w-56 rounded-md border border-gray-100 bg-white shadow-lg">
                 <div className="p-2">
-                  <a href="#" className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50">My profile</a>
-                  <a href="#" className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50">My data</a>
-                  <a href="#" className="block rounded-lg px-4 py-2 text-sm text-gray-500 hover:bg-gray-50">Team settings</a>
-                  <button className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50">
+                  <button 
+                    onClick={handleLogout}
+                    className="flex w-full items-center gap-2 rounded-lg px-4 py-2 text-sm text-red-700 hover:bg-red-50 transition-colors cursor-pointer"
+                  >
+                    <IoMdLogOut size={16} />
                     Logout
                   </button>
                 </div>

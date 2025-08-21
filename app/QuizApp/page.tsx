@@ -2,7 +2,7 @@
  
 import DashboardLayout from '../components/layout/DashboardLayout';
 
-export default function TestNavbarPage() {
+export default function quizApp() {
   return (
     <>
 <DashboardLayout/>

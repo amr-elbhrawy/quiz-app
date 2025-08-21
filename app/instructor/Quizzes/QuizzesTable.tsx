@@ -172,7 +172,7 @@ const [viewQuizId, setViewQuizId] = useState<string | null>(null);
 
   return (
     <div className="space-y-8">
-      {/* 🔍 Controls */}
+      {/*   Controls */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-white rounded-xl shadow-sm">
         {/* Search */}
         <div className="flex items-center border border-gray-200 rounded-lg px-4 py-3 w-full md:w-2/5 bg-gray-50 transition-all focus-within:border-blue-500 focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-200">

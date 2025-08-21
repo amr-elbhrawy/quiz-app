@@ -39,8 +39,7 @@ export default function CustomPagination({
   const [siblings, setSiblings] = useState(1);
   const [boundaries, setBoundaries] = useState(1);
 
-  // تحديث الإعدادات حسب عرض الشاشة
-  const updatePaginationConfig = () => {
+   const updatePaginationConfig = () => {
     const width = window.innerWidth;
     if (width < 400) {
       setSiblings(0);

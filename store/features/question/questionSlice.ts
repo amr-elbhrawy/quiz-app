@@ -2,8 +2,7 @@
 import { createSlice, createAsyncThunk, createSelector, PayloadAction } from "@reduxjs/toolkit";
 import { QuestionService } from "@/services/question.service";
 
-// ✅ أنواع البيانات المحسنة
-export interface Question {
+ export interface Question {
   _id: string;
   id?: string;
   title: string;
@@ -34,19 +33,16 @@ const initialState: QuestionState = {
   totalCount: 0,
 };
 
-// ✅ Cache timeout (5 minutes)
-const CACHE_TIMEOUT = 5 * 60 * 1000;
+ const CACHE_TIMEOUT = 5 * 60 * 1000;
 
-// ✅ Async Thunks with better error handling
-export const fetchQuestions = createAsyncThunk(
+ export const fetchQuestions = createAsyncThunk(
   "questions/fetchAll",
   async (forceRefresh: boolean = false, { getState, rejectWithValue }) => {
     try {
       const state = getState() as { questions: QuestionState };
       const now = Date.now();
       
-      // ✅ تحقق من الـ cache إذا لم يكن إجبارياً
-      if (!forceRefresh && 
+       if (!forceRefresh && 
           state.questions.lastFetch && 
           now - state.questions.lastFetch < CACHE_TIMEOUT &&
           state.questions.questions.length > 0) {
@@ -68,8 +64,7 @@ export const fetchQuestionById = createAsyncThunk(
   "questions/fetchById",
   async (id: string, { getState, rejectWithValue }) => {
     try {
-      // ✅ تحقق من الـ cache أولاً
-      const state = getState() as { questions: QuestionState };
+       const state = getState() as { questions: QuestionState };
       const cachedQuestion = state.questions.questions.find(q => q._id === id);
       
       if (cachedQuestion) {
@@ -135,32 +130,27 @@ export const deleteQuestion = createAsyncThunk(
   }
 );
 
-// ✅ Slice مع تحسينات
-const questionSlice = createSlice({
+ const questionSlice = createSlice({
   name: "questions",
   initialState,
   reducers: {
-    // ✅ Clear error action
-    clearError: (state) => {
+     clearError: (state) => {
       state.error = null;
     },
-    // ✅ Clear single question
-    clearQuestion: (state) => {
+     clearQuestion: (state) => {
       state.question = null;
     },
-    // ✅ Optimistic update for UI responsiveness
-    optimisticDeleteQuestion: (state, action: PayloadAction<string>) => {
+     optimisticDeleteQuestion: (state, action: PayloadAction<string>) => {
       state.questions = state.questions.filter(q => q._id !== action.payload);
       state.totalCount = Math.max(0, state.totalCount - 1);
     },
-    // ✅ Reset state
-    resetQuestionState: (state) => {
+     resetQuestionState: (state) => {
       Object.assign(state, initialState);
     }
   },
   extraReducers: (builder) => {
     builder
-      // ✅ Fetch All Questions
+      //  Fetch All Questions
       .addCase(fetchQuestions.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -177,7 +167,7 @@ const questionSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ✅ Fetch Question By ID
+      //   Fetch Question By ID
       .addCase(fetchQuestionById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -186,8 +176,7 @@ const questionSlice = createSlice({
         state.loading = false;
         state.question = action.payload;
         
-        // ✅ إضافة إلى قائمة الأسئلة إذا لم تكن موجودة
-        const existingIndex = state.questions.findIndex(q => q._id === action.payload._id);
+         const existingIndex = state.questions.findIndex(q => q._id === action.payload._id);
         if (existingIndex === -1) {
           state.questions.push(action.payload);
           state.totalCount += 1;
@@ -200,8 +189,7 @@ const questionSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ✅ Create Question
-      .addCase(createQuestion.pending, (state) => {
+       .addCase(createQuestion.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -215,7 +203,7 @@ const questionSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ✅ Update Question
+      //   Update Question
       .addCase(updateQuestion.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -226,8 +214,7 @@ const questionSlice = createSlice({
         if (index !== -1) {
           state.questions[index] = action.payload;
         }
-        // ✅ تحديث الـ question المنفرد إذا كان هو نفسه
-        if (state.question && state.question._id === action.payload._id) {
+         if (state.question && state.question._id === action.payload._id) {
           state.question = action.payload;
         }
       })
@@ -236,30 +223,27 @@ const questionSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // ✅ Delete Question
-      .addCase(deleteQuestion.pending, (state) => {
+       .addCase(deleteQuestion.pending, (state) => {
         state.error = null;
-        // لا نحتاج loading هنا لأن المستخدم سيرى الـ optimistic update
+         
       })
       .addCase(deleteQuestion.fulfilled, (state, action) => {
-        // ✅ التأكد من الحذف (في حالة عدم استخدام optimistic update)
+       
         state.questions = state.questions.filter((q) => q._id !== action.payload);
         state.totalCount = Math.max(0, state.totalCount - 1);
         
-        // ✅ مسح الـ question المنفرد إذا كان هو المحذوف
-        if (state.question && state.question._id === action.payload) {
+         if (state.question && state.question._id === action.payload) {
           state.question = null;
         }
       })
       .addCase(deleteQuestion.rejected, (state, action) => {
         state.error = action.payload as string;
-        // ✅ إعادة الـ question إذا فشل الحذف (في حالة استخدام optimistic update)
-        // يمكن إضافة logic هنا لإعادة تحميل البيانات
+   
       });
   },
 });
 
-// ✅ Selectors محسنة
+//   Selectors  
 export const selectAllQuestions = (state: { questions: QuestionState }) => 
   state.questions.questions;
 
@@ -275,7 +259,7 @@ export const selectCurrentQuestion = (state: { questions: QuestionState }) =>
 export const selectQuestionsCount = (state: { questions: QuestionState }) => 
   state.questions.totalCount;
 
-// ✅ Memoized selectors
+//   Memoized selectors
 export const selectQuestionsByDifficulty = createSelector(
   [selectAllQuestions, (state, difficulty: string) => difficulty],
   (questions, difficulty) => 
@@ -294,7 +278,7 @@ export const selectQuestionById = createSelector(
     questions.find(question => question._id === id)
 );
 
-// ✅ Combined selectors for statistics
+//  Combined selectors for statistics
 export const selectQuestionsStats = createSelector(
   [selectAllQuestions],
   (questions) => ({
@@ -307,7 +291,7 @@ export const selectQuestionsStats = createSelector(
   })
 );
 
-// ✅ Actions
+//   Actions
 export const { 
   clearError, 
   clearQuestion, 

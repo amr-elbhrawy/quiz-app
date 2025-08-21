@@ -1,5 +1,4 @@
-// QuizDetails.tsx - Updated with a calmer, more elegant design
-"use client";
+ "use client";
 import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";

@@ -1,5 +1,5 @@
-// LoadingSkeletonCard.tsx - النسخة المحسنة
-import { memo } from "react";
+ 
+import { memo, useEffect, useState } from "react";
 import { Card } from "@heroui/card";
 import { Skeleton } from "@heroui/skeleton";
 
@@ -128,7 +128,7 @@ const LoadingSkeletonCard = memo(function LoadingSkeletonCard({
 
 export default LoadingSkeletonCard;
 
-// Hook للاستخدام المتقدم
+ 
 export const useOptimizedLoading = (isLoading: boolean, delay: number = 200) => {
   const [showLoading, setShowLoading] = useState(false);
 

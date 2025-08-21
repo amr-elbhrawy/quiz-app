@@ -25,7 +25,7 @@ interface QuestionFormInputs {
   type: "FE" | "BE";
 }
 
-// ✅ Memoized Field Group Component
+//    Memoized Field Group Component
 const FieldGroup = React.memo(({
   label,
   error,
@@ -75,10 +75,10 @@ export default function EditQuestionModal({
     },
   });
 
-  // ✅ Watch form values for validation feedback
+  //    Watch form values for validation feedback
   const watchedAnswer = watch("answer");
 
-  // ✅ Reset form with question data when question changes
+  //    Reset form with question data when question changes
   useEffect(() => {
     if (question && isOpen) {
       reset({
@@ -97,7 +97,7 @@ export default function EditQuestionModal({
     }
   }, [question, isOpen, reset]);
 
-  // ✅ Memoized form submission
+  //    Memoized form submission
   const onSubmit: SubmitHandler<QuestionFormInputs> = useCallback(async (data) => {
     if (!question?._id) {
       toast.error("Question ID is missing");
@@ -118,7 +118,7 @@ export default function EditQuestionModal({
     }
   }, [dispatch, question?._id, onUpdated, onClose]);
 
-  // ✅ Memoized close handler
+  //    Memoized close handler
   const handleClose = useCallback(() => {
     if (!isSubmitting && !loading) {
       if (isDirty) {
@@ -130,14 +130,14 @@ export default function EditQuestionModal({
     }
   }, [isSubmitting, loading, isDirty, reset, onClose]);
 
-  // ✅ Memoized textarea auto-resize handler
+  //    Memoized textarea auto-resize handler
   const handleTextareaResize = useCallback((e: React.FormEvent<HTMLTextAreaElement>) => {
     const target = e.target as HTMLTextAreaElement;
     target.style.height = "auto";
     target.style.height = target.scrollHeight + "px";
   }, []);
 
-  // ✅ Memoized options for selects
+  //    Memoized options for selects
   const difficultyOptions = useMemo(() => [
     { value: "easy", label: "Easy" },
     { value: "medium", label: "Medium" },
@@ -158,7 +158,7 @@ export default function EditQuestionModal({
 
   const isFormDisabled = isSubmitting || loading;
 
-  // ✅ Don't render if no question
+  //    Don't render if no question
   if (!question) return null;
 
   return (

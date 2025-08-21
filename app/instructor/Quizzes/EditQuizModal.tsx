@@ -12,7 +12,7 @@ interface EditQuizModalProps {
   isOpen: boolean;
   onClose: () => void;
   quizId: string;
-  onUpdated: (updatedQuiz: any) => void; // تعديل هنا لإرسال البيانات
+  onUpdated: (updatedQuiz: any) => void;  
 }
 
 interface QuizFormInputs {
@@ -81,7 +81,7 @@ export default function EditQuizModal({
     fetchQuiz();
   }, [quizId]);
 
-  // إعادة ضبط القيم
+ 
   useEffect(() => {
     if (quizData && groups.length > 0) {
       const groupId = quizData.group || "";
@@ -119,7 +119,7 @@ export default function EditQuizModal({
 
       toast.success("Quiz updated successfully!");
 
-      // إرسال البيانات الجديدة لـ QuizDetails لتحديثها فورًا
+      
       onUpdated(payload);
 
       onClose();

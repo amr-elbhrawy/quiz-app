@@ -1,5 +1,4 @@
-// CompletedQuizzes.tsx
-"use client";
+ "use client";
 import { useEffect, useState, useCallback, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {

@@ -113,10 +113,9 @@ export default function CreateQuizModal({
       
       if (createQuiz.fulfilled.match(resultAction)) {
         const response = resultAction.payload;
-        console.log("✅ Full quiz response:", response);
+        console.log("    Full quiz response:", response);
         
-        // Try multiple possible paths for the quiz code
-        const actualQuizCode = response?.data?.code || 
+         const actualQuizCode = response?.data?.code || 
                               response?.code || 
                               response?.data?.quiz?.code ||
                               response?.quiz?.code;
@@ -127,8 +126,7 @@ export default function CreateQuizModal({
           setCreatedQuizCode(actualQuizCode);
           console.log("🔥 Setting quiz code modal to open with code:", actualQuizCode);
           
-          // Don't close the create modal yet - open code modal first
-          setQuizCodeModalOpen(true);
+           setQuizCodeModalOpen(true);
         } else {
           console.warn("⚠️ No code received from server, response:", response);
           toast.success("Quiz created successfully!");
@@ -137,14 +135,13 @@ export default function CreateQuizModal({
           onClose();
         }
       } else {
-        // Handle rejection
-        const error = resultAction.payload as string;
+         const error = resultAction.payload as string;
         toast.error(error || "Failed to create quiz.");
-        console.error("❌ Quiz creation failed:", resultAction.payload);
+        console.error("    Quiz creation failed:", resultAction.payload);
       }
       
     } catch (error: any) {
-      console.error("❌ Error creating quiz:", error);
+      console.error("    Error creating quiz:", error);
       toast.error("An unexpected error occurred");
     }
   };
@@ -154,8 +151,7 @@ export default function CreateQuizModal({
     setQuizCodeModalOpen(false);
     setCreatedQuizCode(""); // Clear the code after closing
     
-    // Now close the create modal and trigger callbacks
-    reset();
+     reset();
     onCreated();
     onClose();
   };
@@ -180,7 +176,7 @@ export default function CreateQuizModal({
   return (
     <>
       <Modal
-        isOpen={isOpen && !quizCodeModalOpen} // Don't show create modal when code modal is open
+        isOpen={isOpen && !quizCodeModalOpen}  
         placement="top-center"
         onOpenChange={onClose}
         hideCloseButton
@@ -333,8 +329,7 @@ export default function CreateQuizModal({
         </ModalContent>
       </Modal>
 
-      {/* Quiz Code Modal - Render outside the main modal */}
-      <QuizCodeModal
+       <QuizCodeModal
         isOpen={quizCodeModalOpen}
         onClose={handleQuizCodeModalClose}
         code={createdQuizCode}

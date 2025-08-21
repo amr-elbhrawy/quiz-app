@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 import HelpModal from "../Help/HelpModal";
 import MyQuizResults from "@/app/learner/MyQuizResults/MyQuizResults";
 
-// Lazy load heavy components - هيقلل الـ bundle size
+// Lazy load heavy components 
 const Students = dynamic(() => import("@/app/instructor/students/page"), {
   loading: () => <OptimizedSkeleton />
 });
@@ -73,14 +73,14 @@ function DashboardLayout() {
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
 
-  // Optimized selectors - بدل 3 selectors منفصلة
+  // Optimized selectors - 
   const { loadingUser, role, user }: DashboardState = useSelector(
     (state: any) => ({
       loadingUser: state.auth.loadingUser,
       role: state.auth.user?.role?.toLowerCase(),
       user: state.auth.user
     }),
-    shallowEqual // هيمنع re-renders غير ضرورية
+    shallowEqual  
   );
 
   const handleStartQuiz = useCallback((quizId: string) => {
@@ -136,13 +136,11 @@ function DashboardLayout() {
       case "Groups":
         return <Groups />;
       case "Quizzes":
-        // ✅ Show Home component when "Quizzes" is clicked from sidebar
-        return (
+         return (
           <Quizzes setActive={setActive} />
         );
       case "AllQuizzes":
-        // ✅ Show QuizzesTable when "All Quizzes" button is clicked in Home
-        return (
+         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold">All Quizzes</h1>

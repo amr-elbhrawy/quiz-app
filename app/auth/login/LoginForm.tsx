@@ -54,7 +54,7 @@ export default function LoginForm() {
       reset();
       dispatch(clearAuthMessages());
       setTimeout(() => {
-        router.push('/test');
+        router.push('/QuizApp');
       }, 0);
     }
   }, [error, successMsg, dispatch, reset, router, token]);

@@ -1,4 +1,4 @@
-// الحل الكامل: تعديل QuizResultsTable.tsx
+//  
 
 "use client";
 import React, { useEffect, useState, useRef, useCallback, useMemo } from "react";
@@ -88,7 +88,7 @@ export default function QuizResultsTable() {
         let groupName = "Unknown Group";
         let groupMembers = 0;
         
-        // محاولة جلب اسم المجموعة من مصادر مختلفة
+        //   جلب اسم المجموعة من مصادر مختلفة
         if (item.group?.name) {
           groupName = item.group.name;
           groupMembers = item.group.members || 0;
@@ -108,11 +108,11 @@ export default function QuizResultsTable() {
             const foundGroup = groupsData.find(g => g._id === groupId);
             if (foundGroup) {
               groupName = foundGroup.name;
-              console.log("✅ Found group:", foundGroup.name);
-              // حساب عدد الأعضاء من بيانات الطلاب إذا لزم الأمر
-              groupMembers = 0; // أو احسبه من بيانات الطلاب
+              console.log("  Found group:", foundGroup.name);
+         
+              groupMembers = 0;  
             } else {
-              console.warn("⚠️ Group not found for ID:", groupId);
+              console.warn("  Group not found for ID:", groupId);
             }
           }
         }
