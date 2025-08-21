@@ -12,7 +12,7 @@ interface JoinQuizProps {
   onSolveQuiz: (quizId: string) => void;
 }
 
-export default function JoinQuiz({ onSolveQuiz }: JoinQuizProps) {
+function JoinQuiz({ onSolveQuiz }: JoinQuizProps) {
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [quizzes, setQuizzes] = useState([]);
@@ -77,3 +77,5 @@ export default function JoinQuiz({ onSolveQuiz }: JoinQuizProps) {
     </div>
   );
 }
+
+export default JoinQuiz;
