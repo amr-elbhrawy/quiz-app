@@ -6,6 +6,7 @@ import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 import HelpModal from "../Help/HelpModal";
 import MyQuizResults from "@/app/learner/MyQuizResults/MyQuizResults";
+import { Home } from "@/app/instructor/Quizzes/Home";
 
 // Lazy load heavy components 
 const Students = dynamic(() => import("@/app/instructor/students/page"), {
@@ -137,7 +138,7 @@ function DashboardLayout() {
         return <Groups />;
       case "Quizzes":
          return (
-          <Quizzes setActive={setActive} />
+          <Home setActive={setActive} />
         );
       case "AllQuizzes":
          return (
