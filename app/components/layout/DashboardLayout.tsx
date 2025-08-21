@@ -22,7 +22,7 @@ const QuizzesTable = dynamic(() => import("@/app/instructor/Quizzes/QuizzesTable
   loading: () => <OptimizedSkeleton />
 });
 
-const JoinQuiz = dynamic(() => import("@/app/learner/JoinQuiz/page"), {
+const JoinQuiz = dynamic(() => import("@/app/learner/JoinQuiz/JoinQuizPage"), {
   loading: () => <OptimizedSkeleton />
 });
 const UpcomingQuizzes = dynamic(() => 
