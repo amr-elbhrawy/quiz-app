@@ -1,4 +1,4 @@
-// Home.tsx - Fixed Navigation Version
+// Home.tsx - Fixed Props Type
 "use client";
 import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,6 +12,7 @@ import {
   clearSuccessMessage 
 } from "@/store/features/quiz/quizSlice";
 import type { RootState, AppDispatch } from "@/store/store";
+import React from "react";
 
 // Lazy load heavy components
 const UpcomingQuizzes = dynamic(() => import("./UpcomingQuizzes").then(mod => ({ default: mod.UpcomingQuizzes })), {
@@ -73,8 +74,9 @@ const ActionButton = memo(({ icon: Icon, title, onClick }: {
   </button>
 ));
 
+// FIXED: Updated type to match what's being passed from DashboardLayout
 type HomeProps = {
-  setActive: (key: string) => void;
+  setActive: React.Dispatch<React.SetStateAction<string>>;
 };
 
 export default function Home({ setActive }: HomeProps) {
