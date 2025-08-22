@@ -1,24 +1,19 @@
 "use client";
 
-import { ReactNode } from "react";
+import ReduxProvider from "@/store/ReduxProvider";
 import { HeroUIProvider } from "@heroui/react";
-import { Provider as ReduxProvider } from "react-redux";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
-import { store } from "../store/store";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import AuthLoader from "@/app/components/AuthLoader/AuthLoader";
 
-type Props = {
-  children: ReactNode;
-  themeProps?: Record<string, any>;
-};
-
-export function Providers({ children, themeProps }: Props) {
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ReduxProvider store={store}>
-      <HeroUIProvider>
-        <NextThemesProvider {...themeProps}>
-          {children}
-        </NextThemesProvider>
-      </HeroUIProvider>
-    </ReduxProvider>
+    <HeroUIProvider>
+      <ReduxProvider>
+        <AuthLoader />
+        <ToastContainer position="top-right" autoClose={3000} />
+        {children}
+      </ReduxProvider>
+    </HeroUIProvider>
   );
 }

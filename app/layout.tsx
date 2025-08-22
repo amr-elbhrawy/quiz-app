@@ -2,10 +2,6 @@ import "@/styles/globals.css";
 import clsx from "clsx";
 import { fontSans } from "@/config/fonts";
 import { Providers } from "./providers";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-
-import AuthLoader from "@/app/components/AuthLoader/AuthLoader";
 
 export default function RootLayout({
   children,
@@ -20,11 +16,7 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers>
-          <AuthLoader /> {/* تحميل بيانات المستخدم من localStorage */}
-          <ToastContainer position="top-right" autoClose={3000} />
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

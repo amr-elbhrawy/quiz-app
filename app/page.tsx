@@ -1,22 +1,7 @@
-// app/layout.tsx
-'use client';
-
-import ReduxProvider from '@/store/ReduxProvider';
-import { HeroUIProvider } from '@heroui/react';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function HomePage() {
   return (
-    <html lang="en">
-      <body>
-        <HeroUIProvider>
-          <ReduxProvider>
-            <ToastContainer position="top-right" autoClose={3000} />
-            {children}
-          </ReduxProvider>
-        </HeroUIProvider>
-      </body>
-    </html>
+    <main className="flex min-h-screen items-center justify-center">
+      <h1 className="text-3xl font-bold">Welcome to My App 🚀</h1>
+    </main>
   );
 }
