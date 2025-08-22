@@ -180,32 +180,38 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           {errors.password && <p className="text-red-500 text-xs -mt-1 mb-2 px-2">{errors.password.message}</p>}
         </div>
 
-        <div>
-          <div className="relative">
-            <InputShared
-              name="confirmPassword"
-              register={register}
-              label="Confirm Password"
-              placeholder="Re-type your password"
-              type={showConfirmPassword ? "text" : "password"}
-              iconInput={<FaLock className="text-gray-500" />}
-              validation={{
-                required: "Please confirm your password",
-                validate: value => value === password || "Passwords do not match",
-              }}
-            />
-            <button
-              type="button"
-              onClick={toggleConfirmPasswordVisibility}
-              className="absolute right-5 top-11 text-gray-500 hover:text-gray-300 transition-colors duration-200 focus:outline-none z-10"
-              title={showConfirmPassword ? "Hide password" : "Show password"}
-              aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-            >
-              {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
-            </button>
-          </div>
-          {errors.confirmPassword && <p className="text-red-500 text-xs -mt-1 mb-2 px-2">{errors.confirmPassword.message}</p>}
-        </div>
+<div>
+  <div className="relative">
+    <InputShared
+      name="confirmPassword"
+      register={register}
+      label="Confirm Password"
+      placeholder="Re-type your password"
+      type={showConfirmPassword ? "text" : "password"}
+      iconInput={<FaLock className="text-gray-500" />}
+      validation={{
+        required: "Please confirm your password",
+        validate: (value: string) =>
+          value === password || "Passwords do not match",
+      }}
+    />
+    <button
+      type="button"
+      onClick={toggleConfirmPasswordVisibility}
+      className="absolute right-5 top-11 text-gray-500 hover:text-gray-300 transition-colors duration-200 focus:outline-none z-10"
+      title={showConfirmPassword ? "Hide password" : "Show password"}
+      aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+    >
+      {showConfirmPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+    </button>
+  </div>
+  {errors.confirmPassword && (
+    <p className="text-red-500 text-xs -mt-1 mb-2 px-2">
+      {errors.confirmPassword.message}
+    </p>
+  )}
+</div>
+
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
           <button
