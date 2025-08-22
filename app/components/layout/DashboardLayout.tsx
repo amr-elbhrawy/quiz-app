@@ -32,7 +32,7 @@ const UpcomingQuizzes = dynamic(() =>
 const QuizDetails = dynamic(() => import("@/app/instructor/Quizzes/QuizDetails"), {
   loading: () => <OptimizedSkeleton />
 });
-const Questions = dynamic(() => import("@/app/instructor/Questions/page"), {
+const Questions = dynamic(() => import("@/app/instructor/Questions/Questionspage"), {
   loading: () => <OptimizedSkeleton />
 });
 const SolveQuestionModal = dynamic(() => import("@/app/learner/JoinQuiz/SolveQuestionModal"), {
