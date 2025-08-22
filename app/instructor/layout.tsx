@@ -1,5 +1,5 @@
 import React from 'react'
-import QuizzesPage from './Quizzes/page'
+import QuizzesPage from './Quizzes/Quizpage'
 
 export default function layout() {
   return (

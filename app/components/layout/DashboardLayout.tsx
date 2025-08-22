@@ -9,13 +9,13 @@ import MyQuizResults from "@/app/learner/MyQuizResults/MyQuizResults";
 import { Home } from "@/app/instructor/Quizzes/Home";
 
 // Lazy load heavy components 
-const Students = dynamic(() => import("@/app/instructor/students/page"), {
+const Students = dynamic(() => import("@/app/instructor/students/Studentspage"), {
   loading: () => <OptimizedSkeleton />
 });
 const Groups = dynamic(() => import("@/app/instructor/group/GroupsList"), {
   loading: () => <OptimizedSkeleton />
 });
-const Quizzes = dynamic(() => import("@/app/instructor/Quizzes/page"), {
+const Quizzes = dynamic(() => import("@/app/instructor/Quizzes/Quizpage"), {
   loading: () => <OptimizedSkeleton />
 });
 const QuizzesTable = dynamic(() => import("@/app/instructor/Quizzes/QuizzesTable"), {
@@ -41,7 +41,7 @@ const SolveQuestionModal = dynamic(() => import("@/app/learner/JoinQuiz/SolveQue
 const ScoreModal = dynamic(() => import("@/app/learner/JoinQuiz/ScoreModal"), {
   loading: () => null
 });
-const QuizResultsTable = dynamic(() => import("@/app/instructor/Results/page"), {
+const QuizResultsTable = dynamic(() => import("@/app/instructor/Results/Resultspage"), {
   loading: () => <OptimizedSkeleton />
 });
 
