@@ -13,13 +13,22 @@ interface SidebarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (isOpen: boolean) => void;
   onHelp: () => void;
+  onLogoutStart?: () => void;
 }
 
-const Sidebar = React.memo(({ active, setActive, isSidebarOpen, setIsSidebarOpen, onHelp }: SidebarProps) => {
+const Sidebar = React.memo(({ 
+  active, 
+  setActive, 
+  isSidebarOpen, 
+  setIsSidebarOpen, 
+  onHelp,
+  onLogoutStart 
+}: SidebarProps) => {
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const dispatch = useDispatch();
 
-   const rawRole = useSelector((state: any) => state.auth.user?.role);
+  const rawRole = useSelector((state: any) => state.auth.user?.role);
   const role = rawRole ? rawRole.toLowerCase() : "";
 
   const menuItemsByRole = {
@@ -28,7 +37,6 @@ const Sidebar = React.memo(({ active, setActive, isSidebarOpen, setIsSidebarOpen
       { name: "Students", icon: <FaUserGraduate size={22} /> },
       { name: "Groups", icon: <FaUsers size={22} /> },
       { name: "Quizzes", icon: <MdOutlineQuiz size={22} /> },
-      
       { name: "Questions", icon: <FaQuestionCircle size={22} /> },
       { name: "Results", icon: <FaChartBar size={22} /> },
       { name: "Help", icon: <FaQuestionCircle size={22} /> },
@@ -52,11 +60,27 @@ const Sidebar = React.memo(({ active, setActive, isSidebarOpen, setIsSidebarOpen
     setIsSidebarOpen(false);
   }, [setActive, onHelp, setIsSidebarOpen]);
 
-  const handleLogout = useCallback(() => {
-    dispatch(logout());
-    setIsSidebarOpen(false);
-    window.location.href = '/auth';
-  }, [dispatch, setIsSidebarOpen]);
+  const handleLogout = useCallback(async () => {
+    try {
+      setIsLoggingOut(true);
+      
+      if (onLogoutStart) {
+        onLogoutStart();
+      }
+      
+      await dispatch(logout());
+      
+      setIsSidebarOpen(false);
+      
+      setTimeout(() => {
+        window.location.href = '/auth';
+      }, 500);
+      
+    } catch (error) {
+      console.error('Logout error:', error);
+      setIsLoggingOut(false);
+    }
+  }, [dispatch, setIsSidebarOpen, onLogoutStart]);
 
   const toggleSidebarExpanded = useCallback(() => {
     setIsSidebarExpanded(prev => !prev);
@@ -95,7 +119,9 @@ const Sidebar = React.memo(({ active, setActive, isSidebarOpen, setIsSidebarOpen
               <button
                 key={item.name}
                 onClick={() => handleMenuItemClick(item.name)}
+                disabled={isLoggingOut}
                 className={`flex items-center gap-3 p-3 rounded-md transition-all duration-200 w-full text-left cursor-pointer
+                  ${isLoggingOut ? 'opacity-50 cursor-not-allowed' : ''}
                   ${active === item.name ? "border-r-4 border-[#0d1321] bg-white" : "hover:bg-gray-100"}`}
               >
                 <div className="p-2 rounded-md bg-[#fde9df]">{item.icon}</div>
@@ -114,12 +140,25 @@ const Sidebar = React.memo(({ active, setActive, isSidebarOpen, setIsSidebarOpen
         <div className="p-4 border-t border-gray-200">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full p-3 rounded-md hover:bg-gray-100 transition cursor-pointer"
+            disabled={isLoggingOut}
+            className={`flex items-center gap-3 w-full p-3 rounded-md transition cursor-pointer
+              ${isLoggingOut 
+                ? 'bg-gray-100 opacity-50 cursor-not-allowed' 
+                : 'hover:bg-gray-100'
+              }`}
           >
             <div className="p-2 rounded-md bg-[#fde9df]">
-              <IoMdLogOut size={22} />
+              {isLoggingOut ? (
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-500"></div>
+              ) : (
+                <IoMdLogOut size={22} />
+              )}
             </div>
-            {isSidebarExpanded && <span className="font-medium">Logout</span>}
+            {isSidebarExpanded && (
+              <span className="font-medium">
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
+              </span>
+            )}
           </button>
         </div>
       </div>

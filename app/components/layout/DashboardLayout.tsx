@@ -57,10 +57,21 @@ const OptimizedSkeleton = () => (
   </div>
 );
 
+const LogoutSpinner = () => (
+  <div className="flex items-center justify-center h-64">
+    <div className="text-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p className="text-gray-600">Logging out...</p>
+      <p className="text-sm text-gray-400 mt-2">Please wait</p>
+    </div>
+  </div>
+);
+
 interface DashboardState {
   loadingUser: boolean;
   role: string | undefined;
   user: any;
+  isLoggingOut: boolean;
 }
 
 function DashboardLayout() {
@@ -73,13 +84,14 @@ function DashboardLayout() {
   const [finalTotal, setFinalTotal] = useState<number | null>(null);
   const [isScoreModalOpen, setIsScoreModalOpen] = useState(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  // Optimized selectors - 
   const { loadingUser, role, user }: DashboardState = useSelector(
     (state: any) => ({
       loadingUser: state.auth.loadingUser,
       role: state.auth.user?.role?.toLowerCase(),
-      user: state.auth.user
+      user: state.auth.user,
+      isLoggingOut: state.auth.isLoggingOut || false
     }),
     shallowEqual  
   );
@@ -112,6 +124,10 @@ function DashboardLayout() {
 
   const handleCloseHelpModal = useCallback(() => {
     setIsHelpModalOpen(false);
+  }, []);
+
+  const handleLogoutStart = useCallback(() => {
+    setIsLoggingOut(true);
   }, []);
 
   useEffect(() => {
@@ -169,7 +185,6 @@ function DashboardLayout() {
     }
   }, [active, selectedQuizId, handleQuizSelect, handleBackToDashboard]);
 
-
   // Memoized student content
   const studentContent = useMemo(() => {
     switch (active) {
@@ -193,9 +208,8 @@ function DashboardLayout() {
         );
       case "JoinQuiz":
         return <JoinQuiz onSolveQuiz={handleStartQuiz} />;
-        case "Results":
-  return <MyQuizResults />;
-
+      case "Results":
+        return <MyQuizResults />;
       default:
         return (
           <div className="p-6 text-center text-gray-500">
@@ -205,8 +219,11 @@ function DashboardLayout() {
     }
   }, [active, handleStartQuiz, user]);
 
-  // Main content renderer
   const renderContent = useMemo(() => {
+    if (isLoggingOut) {
+      return <LogoutSpinner />;
+    }
+
     if (loadingUser) {
       return (
         <div className="flex items-center justify-center h-64">
@@ -241,7 +258,7 @@ function DashboardLayout() {
         </div>
       </div>
     );
-  }, [loadingUser, user, role, instructorContent, studentContent]);
+  }, [loadingUser, user, role, instructorContent, studentContent, isLoggingOut]);
 
   return (
     <div className="flex h-screen w-full max-w-full overflow-hidden">
@@ -251,6 +268,7 @@ function DashboardLayout() {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         onHelp={handleHelp}
+        onLogoutStart={handleLogoutStart}
       />
       <div className="flex-1 flex flex-col min-w-0 w-full">
         <Navbar setIsSidebarOpen={setIsSidebarOpen} active={active} />

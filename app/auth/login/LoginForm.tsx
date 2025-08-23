@@ -28,8 +28,8 @@ export default function LoginForm() {
   } = useForm<LoginFormInputs>({
     mode: "onChange",
     defaultValues: {
-      email: "",
-      password: ""
+      email: "shadyelsayed302@gmail.com",
+      password: "#Fares7az"
     }
   });
   
