@@ -1,4 +1,4 @@
- "use client";
+"use client";
 import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
@@ -101,8 +101,9 @@ export default function QuizDetails({
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0); // إضافة trigger للتحديث
 
-  // Fetch quiz on mount
+  // Fetch quiz on mount and when refreshTrigger changes
   useEffect(() => {
     if (quizId) {
       dispatch(fetchQuizById(quizId));
@@ -111,7 +112,7 @@ export default function QuizDetails({
     return () => {
       dispatch(clearQuiz());
     };
-  }, [dispatch, quizId]);
+  }, [dispatch, quizId, refreshTrigger]); // إضافة refreshTrigger كـ dependency
 
   // Memoized computed values
   const formattedSchedule = useMemo(() => {
@@ -142,9 +143,12 @@ export default function QuizDetails({
   const handleOpenDelete = useCallback(() => setDeleteOpen(true), []);
   const handleCloseDelete = useCallback(() => setDeleteOpen(false), []);
 
+  // تحديث handler للتعامل مع البيانات الجديدة
   const handleQuizUpdated = useCallback((updatedQuiz: any) => {
     setEditOpen(false);
     toast.success("Quiz updated successfully!");
+    // إعادة جلب البيانات من الـ server
+    setRefreshTrigger(prev => prev + 1);
   }, []);
 
   const handleDelete = useCallback(async () => {

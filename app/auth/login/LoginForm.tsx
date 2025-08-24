@@ -33,7 +33,7 @@ export default function LoginForm() {
     }
   });
   
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(false) 
 
   const onSubmit = (data: LoginFormInputs) => {
     dispatch(loginThunk(data));
@@ -49,14 +49,15 @@ export default function LoginForm() {
       dispatch(clearAuthMessages());
     }
 
-    if (successMsg && token) {
-      toast.success(successMsg);
-      reset();
-      dispatch(clearAuthMessages());
-      setTimeout(() => {
-        router.push('/QuizApp');
-      }, 0);
-    }
+if (successMsg && token) {
+  toast.success(successMsg);
+  reset();
+  dispatch(clearAuthMessages());
+  setTimeout(() => {
+    router.push('/QuizApp');
+  }, 1000); // ثانية واحدة كافية
+}
+
   }, [error, successMsg, dispatch, reset, router, token]);
 
   return (
